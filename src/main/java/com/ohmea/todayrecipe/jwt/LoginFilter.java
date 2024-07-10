@@ -1,6 +1,7 @@
 package com.ohmea.todayrecipe.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ohmea.todayrecipe.dto.response.ErrorResponseDTO;
 import com.ohmea.todayrecipe.dto.response.ResponseDTO;
 import com.ohmea.todayrecipe.dto.user.CustomUserDetails;
 import jakarta.servlet.FilterChain;
@@ -52,9 +53,11 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         String role = auth.getAuthority();
 
 
-        String token = jwtUtil.createJwt(username, role, 60*60*10L);
+        String accesstoken = jwtUtil.createJwt("accessToken", username, role, 60*60*10L);
+        String refreshToken = jwtUtil.createJwt("refreshToken", username, role, 60*60*10*10L);
 
-        response.addHeader("Authorization", "Bearer " + token);
+        response.addHeader("accessToken", "Bearer " + accesstoken);
+        response.addHeader("refreshToken", "Bearer " + refreshToken);
 
         ResponseDTO<String> responseDTO = new ResponseDTO<>(HttpStatus.OK.value(), "로그인 성공, 헤더 토큰을 확인하세요.", null);
         response.setContentType("application/json");
@@ -66,9 +69,16 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     }
 
     @Override
-    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) {
+    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException {
 
         response.setStatus(401);
+
+        ErrorResponseDTO responseDTO = new ErrorResponseDTO(HttpStatus.UNAUTHORIZED.value(), "로그인 실패");
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonResponse = objectMapper.writeValueAsString(responseDTO);
+        response.getWriter().write(jsonResponse);
     }
 }
 
