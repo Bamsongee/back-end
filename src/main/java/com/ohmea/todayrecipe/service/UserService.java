@@ -1,35 +1,45 @@
 package com.ohmea.todayrecipe.service;
 
-import com.ohmea.todayrecipe.dto.user.RegisterDTO;
+import com.ohmea.todayrecipe.dto.response.ResponseDTO;
+import com.ohmea.todayrecipe.dto.user.JoinDTO;
 import com.ohmea.todayrecipe.entity.UserEntity;
 import com.ohmea.todayrecipe.exception.EntityDuplicatedException;
 import com.ohmea.todayrecipe.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public void register(RegisterDTO registerDTO) {
-        String username = registerDTO.getUsername();
-        // 비밀번호 암호화
-        String encryptedPassword = bCryptPasswordEncoder.encode(registerDTO.getPassword());
+    public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
 
-        // username이 존재하는지 확인
-        Boolean isExist = userRepository.existsByUsername(username);
-
-        // username이 존재한다면
-        if (isExist) {
-            throw new EntityDuplicatedException("동일한 아이디가 존재합니다.");
-        }
-
-        UserEntity userEntity = new UserEntity(username, encryptedPassword, "ROLE_ADMIN");
-
-        userRepository.save(userEntity);
+        this.userRepository = userRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
+    public ResponseDTO<String> joinProcess(JoinDTO joinDTO) {
+
+        String username = joinDTO.getUsername();
+        String password = joinDTO.getPassword();
+
+        Boolean isExist = userRepository.existsByUsername(username);
+
+        if (isExist) {
+
+            throw new EntityDuplicatedException("중복된 아이디가 존재합니다.");
+        }
+
+        UserEntity data = new UserEntity();
+
+        data.setUsername(username);
+        data.setPassword(bCryptPasswordEncoder.encode(password));
+        data.setRole("ROLE_ADMIN");
+
+        userRepository.save(data);
+
+        return new ResponseDTO<>(HttpStatus.CREATED.value(), "회원가입 성공", null);
+    }
 }
