@@ -1,6 +1,7 @@
 package com.ohmea.todayrecipe.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ohmea.todayrecipe.dto.user.CustomUserDetails;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -19,6 +20,7 @@ import java.util.Iterator;
 @RequiredArgsConstructor
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
+    private final JWTUtil jwtUtil;
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
@@ -37,17 +39,33 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         return authenticationManager.authenticate(authToken);
     }
 
-    //로그인 성공시 실행하는 메소드 (여기서 JWT를 발급)
+    // 로그인 성공시 실행하는 메소드 (여기서 JWT를 발급)
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException {
-        // 테스트
-        System.out.println("Fail");
+        // UserDetails
+        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+
+        // 정보 가져오기(id, username, role)
+        String username = customUserDetails.getUsername();
+        Long userId = customUserDetails.getId();
+        System.out.println(userId);
+
+        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
+        GrantedAuthority auth = iterator.next();
+
+        String role = auth.getAuthority();
+
+        // 토큰 생성
+        String token = jwtUtil.createJwt("self", "access", username, role, 60*60*10L); // 24시간(하루)
+
+        // access 토큰 설정
+        response.setHeader("Authorization", "Bearer " + token);
     }
 
     //로그인 실패시 실행하는 메소드
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) {
-        // 테스트
-        System.out.println("Success");
+        response.setStatus(401);
     }
 }

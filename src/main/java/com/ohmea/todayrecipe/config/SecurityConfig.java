@@ -1,5 +1,6 @@
 package com.ohmea.todayrecipe.config;
 
+import com.ohmea.todayrecipe.jwt.JWTUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +22,7 @@ import com.ohmea.todayrecipe.jwt.LoginFilter;
 @EnableWebSecurity
 public class SecurityConfig {
     private final AuthenticationConfiguration authenticationConfiguration;
+    private final JWTUtil jwtUtil;
 
     // AuthenticationManager Bean 등록
     @Bean
@@ -49,7 +51,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()) // 로그인한 사용자만 접근
 
                 // 로그인
-                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration)), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class)
 
 
                 // 세션 설정
