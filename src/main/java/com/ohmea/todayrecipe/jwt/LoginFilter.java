@@ -53,9 +53,11 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         String role = auth.getAuthority();
 
 
-        String token = jwtUtil.createJwt(username, role, 60*60*10L);
+        String accesstoken = jwtUtil.createJwt("accessToken", username, role, 60*60*10L);
+        String refreshToken = jwtUtil.createJwt("refreshToken", username, role, 60*60*10*10L);
 
-        response.addHeader("Authorization", "Bearer " + token);
+        response.addHeader("accessToken", "Bearer " + accesstoken);
+        response.addHeader("refreshToken", "Bearer " + refreshToken);
 
         ResponseDTO<String> responseDTO = new ResponseDTO<>(HttpStatus.OK.value(), "로그인 성공, 헤더 토큰을 확인하세요.", null);
         response.setContentType("application/json");
