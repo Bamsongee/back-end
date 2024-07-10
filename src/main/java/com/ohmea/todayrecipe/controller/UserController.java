@@ -19,6 +19,11 @@ public class UserController {
 
     private final UserService joinService;
 
+    @GetMapping("/")
+    public ResponseDTO<String> init(){
+        return new ResponseDTO<String>(HttpStatus.OK.value(), "배포 성공", null);
+    }
+
     @PostMapping("/join")
     public ResponseEntity<ResponseDTO<String>> joinProcess(JoinDTO joinDTO) {
 
