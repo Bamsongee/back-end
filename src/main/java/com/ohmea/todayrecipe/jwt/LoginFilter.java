@@ -2,6 +2,7 @@ package com.ohmea.todayrecipe.jwt;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ohmea.todayrecipe.dto.response.ErrorResponseDTO;
 import com.ohmea.todayrecipe.dto.response.ResponseDTO;
 import com.ohmea.todayrecipe.dto.user.CustomUserDetails;
 import jakarta.servlet.FilterChain;
@@ -67,9 +68,16 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     }
 
     @Override
-    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) {
+    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException {
 
         response.setStatus(401);
+
+        ErrorResponseDTO responseDTO = new ErrorResponseDTO(HttpStatus.UNAUTHORIZED.value(), "로그인 실패");
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonResponse = objectMapper.writeValueAsString(responseDTO);
+        response.getWriter().write(jsonResponse);
     }
 }
 
