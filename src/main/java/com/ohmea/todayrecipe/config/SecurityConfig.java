@@ -15,7 +15,7 @@ public class SecurityConfig {
 
     // 암호화에 사용
     @Bean
-    public PasswordEncoder passwordEncoder() {
+    public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
