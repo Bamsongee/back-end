@@ -19,6 +19,7 @@ public class RecipeEntity {
     private String link;
     private String imgURL;
     private String ingredients;
+    @Column(columnDefinition = "TEXT")
     private String recipe;
     private String serving;
     private String time;
