@@ -4,7 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Setter
+@Builder
+@AllArgsConstructor
 @Getter
 public class UserEntity {
 

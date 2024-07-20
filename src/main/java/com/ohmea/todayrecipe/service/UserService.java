@@ -39,16 +39,16 @@ public class UserService {
             throw new EntityDuplicatedException("중복된 아이디가 존재합니다.");
         }
 
-        UserEntity user = new UserEntity();
-
-        user.setUsername(username);
-        user.setPassword(bCryptPasswordEncoder.encode(password));
-        user.setAge(age);
-        user.setGender(gender);
-        user.setCookingBudget(cookingBudget);
-        user.setCookingSkill(cookingSkill);
-        user.setFilter(filter);
-        user.setRole("ROLE_ADMIN");
+        UserEntity user = UserEntity.builder()
+                .username(username)
+                .password(bCryptPasswordEncoder.encode(password))
+                .gender(gender)
+                .cookingSkill(cookingSkill)
+                .cookingBudget(cookingBudget)
+                .filter(filter)
+                .age(age)
+                .role("ROLE_ADMIN")
+                .build();
 
         userRepository.save(user);
 
