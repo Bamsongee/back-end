@@ -19,7 +19,7 @@ public class ProductController {
     @Autowired
     private final ProductService productService;
 
-    @GetMapping("/all")
+    @GetMapping
     ResponseEntity<ResponseDTO<List<ProductResponseDTO>>> getProducts() {
         List<ProductResponseDTO> response = productService.getProductList();
 
