@@ -1,5 +1,6 @@
 package com.ohmea.todayrecipe.service;
 
+import com.ohmea.todayrecipe.dto.recipe.RecipeResponseDTO;
 import com.ohmea.todayrecipe.entity.ProductEntity;
 import com.ohmea.todayrecipe.entity.RecipeEntity;
 import com.ohmea.todayrecipe.repository.RecipeRepository;
@@ -9,6 +10,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -27,7 +29,15 @@ public class RecipeService {
         recipeRepository.saveAll(recipes);
     }
 
-    public List<RecipeEntity> getAllRecipes() {
-        return recipeRepository.findAll();
+    public List<RecipeResponseDTO> getAllRecipes() {
+
+        List<RecipeEntity> recipeEntities = recipeRepository.findAll();
+        List<RecipeResponseDTO> recipeResponseDTOList = new ArrayList<>();
+
+        recipeEntities.forEach(entity -> {
+            recipeResponseDTOList.add(RecipeResponseDTO.toDto(entity));
+        });
+
+        return recipeResponseDTOList;
     }
 }
