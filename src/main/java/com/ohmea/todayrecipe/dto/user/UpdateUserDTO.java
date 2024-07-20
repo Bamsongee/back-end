@@ -1,17 +1,16 @@
 package com.ohmea.todayrecipe.dto.user;
 
 import com.ohmea.todayrecipe.entity.CookingSkillEnum;
-import com.ohmea.todayrecipe.entity.GenderEnum;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 
-@Setter
+@Builder
 @Getter
-public class JoinDTO {
-    private String username;
-    private String password;
-    private GenderEnum gender;
-    private Integer age;
+@AllArgsConstructor
+@NoArgsConstructor
+public class UpdateUserDTO {
     private CookingSkillEnum cookingSkill;
     private Integer cookingBudget;
     private String filter;

@@ -53,8 +53,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         String role = auth.getAuthority();
 
 
-        String accesstoken = jwtUtil.createJwt("accessToken", username, role, 60*60*10L);
-        String refreshToken = jwtUtil.createJwt("refreshToken", username, role, 60*60*10*10L);
+        String accesstoken = jwtUtil.createJwt("accessToken", username, role, 86400000L);
+        String refreshToken = jwtUtil.createJwt("refreshToken", username, role, 86400000L);
 
         response.addHeader("accessToken", "Bearer " + accesstoken);
         response.addHeader("refreshToken", "Bearer " + refreshToken);
