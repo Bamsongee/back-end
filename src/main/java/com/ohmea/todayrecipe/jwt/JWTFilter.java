@@ -2,6 +2,7 @@ package com.ohmea.todayrecipe.jwt;
 
 import com.ohmea.todayrecipe.dto.user.CustomUserDetails;
 import com.ohmea.todayrecipe.entity.UserEntity;
+import com.ohmea.todayrecipe.exception.NotRefreshTokenException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -47,6 +48,11 @@ public class JWTFilter extends OncePerRequestFilter {
             return;
         }
 
+        // access token을 입력했는지 확인
+        String type = jwtUtil.getType(token);
+        if (!type.equals("accessToken")) {
+            throw new NotRefreshTokenException("accessToken이 아닙니다.");
+        }
 
         String username = jwtUtil.getUsername(token);
         String role = jwtUtil.getRole(token);
