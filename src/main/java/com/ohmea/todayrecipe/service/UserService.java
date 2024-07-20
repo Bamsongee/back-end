@@ -2,6 +2,7 @@ package com.ohmea.todayrecipe.service;
 
 import com.ohmea.todayrecipe.dto.response.ResponseDTO;
 import com.ohmea.todayrecipe.dto.user.JoinDTO;
+import com.ohmea.todayrecipe.dto.user.UpdateUserDTO;
 import com.ohmea.todayrecipe.dto.user.UserResponseDTO;
 import com.ohmea.todayrecipe.entity.CookingSkillEnum;
 import com.ohmea.todayrecipe.entity.GenderEnum;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserService {
@@ -59,6 +61,25 @@ public class UserService {
     public UserResponseDTO getUserInfo(String username) {
         UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 사용자 이름을 가진 사용자를 찾을 수 없습니다: " + username));
+
+        return UserResponseDTO.builder()
+                .username(user.getUsername())
+                .gender(user.getGender())
+                .age(user.getAge())
+                .cookingBudget(user.getCookingBudget())
+                .cookingSkill(user.getCookingSkill())
+                .filter(user.getFilter())
+                .build();
+    }
+
+    @Transactional
+    public UserResponseDTO updateUser(String username, UpdateUserDTO updateUserDTO) {
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("해당 사용자 이름을 가진 사용자를 찾을 수 없습니다: " + username));
+
+        user.updateUser(updateUserDTO.getCookingSkill(), updateUserDTO.getCookingBudget(), updateUserDTO.getFilter());
+
+        userRepository.save(user);
 
         return UserResponseDTO.builder()
                 .username(user.getUsername())

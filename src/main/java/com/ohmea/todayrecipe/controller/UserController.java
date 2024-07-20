@@ -2,6 +2,7 @@ package com.ohmea.todayrecipe.controller;
 
 import com.ohmea.todayrecipe.dto.response.ResponseDTO;
 import com.ohmea.todayrecipe.dto.user.JoinDTO;
+import com.ohmea.todayrecipe.dto.user.UpdateUserDTO;
 import com.ohmea.todayrecipe.dto.user.UserResponseDTO;
 import com.ohmea.todayrecipe.exception.AccessTokenExpiredException;
 import com.ohmea.todayrecipe.exception.NotRefreshTokenException;
@@ -18,9 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -94,4 +93,17 @@ public class UserController {
                 .status(HttpStatus.OK.value())
                 .body(new ResponseDTO<UserResponseDTO>(200, "user 조회가 완료되었습니다.", userResponseDTO));
     }
+
+    @PutMapping("/update")
+    public ResponseEntity<ResponseDTO<UserResponseDTO>> updateUser(@RequestBody UpdateUserDTO updateUserDTO) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = authentication.getPrincipal();
+        String username = ((UserDetails) principal).getUsername();
+
+        UserResponseDTO userResponseDTO = userService.updateUser(username, updateUserDTO);
+        return ResponseEntity
+                .status(HttpStatus.OK.value())
+                .body(new ResponseDTO<UserResponseDTO>(200, "user 수정이 완료되었습니다.", userResponseDTO));
+    }
+
 }

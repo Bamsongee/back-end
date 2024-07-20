@@ -30,4 +30,12 @@ public class UserEntity {
     private String filter;
     // admin
     private String role;
+
+    // user 정보 업데이트
+    public void updateUser(CookingSkillEnum cookingSkill, Integer cookingBudget, String filter) {
+        this.cookingSkill = cookingSkill == null ? this.cookingSkill : cookingSkill;
+        this.cookingBudget = cookingBudget == null ? this.cookingBudget : cookingBudget;
+        this.filter = filter == null ? this.filter : filter;
+    }
+
 }
