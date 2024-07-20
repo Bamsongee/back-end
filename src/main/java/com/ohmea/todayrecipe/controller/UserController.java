@@ -2,6 +2,7 @@ package com.ohmea.todayrecipe.controller;
 
 import com.ohmea.todayrecipe.dto.response.ResponseDTO;
 import com.ohmea.todayrecipe.dto.user.JoinDTO;
+import com.ohmea.todayrecipe.dto.user.UserResponseDTO;
 import com.ohmea.todayrecipe.exception.AccessTokenExpiredException;
 import com.ohmea.todayrecipe.exception.NotRefreshTokenException;
 import com.ohmea.todayrecipe.exception.TokenNotFoundException;
@@ -25,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserService joinService;
+    private final UserService userService;
     private final JWTUtil jwtUtil;
 
     @GetMapping("/")
@@ -36,7 +37,7 @@ public class UserController {
     @PostMapping("/join")
     public ResponseEntity<ResponseDTO<String>> joinProcess(JoinDTO joinDTO) {
 
-        ResponseDTO<String> response = joinService.joinProcess(joinDTO);
+        ResponseDTO<String> response = userService.joinProcess(joinDTO);
 
         return ResponseEntity
                 .status(HttpStatus.OK.value())
@@ -78,12 +79,19 @@ public class UserController {
                 .body(new ResponseDTO<>(200, "accessToken 재발급 완료. 헤더를 확인하세요.", null));
     }
 
-
-    @GetMapping("/login-test")
-    public String getUsername() {
+    /**
+     * 마이페이지 조회
+     * @return
+     */
+    @GetMapping("/mypage")
+    public ResponseEntity<ResponseDTO<UserResponseDTO>> mypage() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Object principal = authentication.getPrincipal();
         String username = ((UserDetails) principal).getUsername();
-        return "Username: " + username;
+
+        UserResponseDTO userResponseDTO = userService.getUserInfo(username);
+        return ResponseEntity
+                .status(HttpStatus.OK.value())
+                .body(new ResponseDTO<UserResponseDTO>(200, "user 조회가 완료되었습니다.", userResponseDTO));
     }
 }

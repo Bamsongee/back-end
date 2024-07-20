@@ -5,8 +5,9 @@ import lombok.*;
 
 @Entity
 @Builder
-@AllArgsConstructor
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserEntity {
 
     @Id
