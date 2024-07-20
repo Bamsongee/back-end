@@ -2,6 +2,8 @@ package com.ohmea.todayrecipe.service;
 
 import com.ohmea.todayrecipe.dto.response.ResponseDTO;
 import com.ohmea.todayrecipe.dto.user.JoinDTO;
+import com.ohmea.todayrecipe.entity.CookingSkillEnum;
+import com.ohmea.todayrecipe.entity.GenderEnum;
 import com.ohmea.todayrecipe.entity.UserEntity;
 import com.ohmea.todayrecipe.exception.EntityDuplicatedException;
 import com.ohmea.todayrecipe.repository.UserRepository;
@@ -24,6 +26,11 @@ public class UserService {
 
         String username = joinDTO.getUsername();
         String password = joinDTO.getPassword();
+        GenderEnum gender = joinDTO.getGender();
+        Integer age = joinDTO.getAge();
+        Integer cookingBudget = joinDTO.getCookingBudget();
+        String filter = joinDTO.getFilter();
+        CookingSkillEnum cookingSkill = joinDTO.getCookingSkill();
 
         Boolean isExist = userRepository.existsByUsername(username);
 
@@ -32,13 +39,18 @@ public class UserService {
             throw new EntityDuplicatedException("중복된 아이디가 존재합니다.");
         }
 
-        UserEntity data = new UserEntity();
+        UserEntity user = new UserEntity();
 
-        data.setUsername(username);
-        data.setPassword(bCryptPasswordEncoder.encode(password));
-        data.setRole("ROLE_ADMIN");
+        user.setUsername(username);
+        user.setPassword(bCryptPasswordEncoder.encode(password));
+        user.setAge(age);
+        user.setGender(gender);
+        user.setCookingBudget(cookingBudget);
+        user.setCookingSkill(cookingSkill);
+        user.setFilter(filter);
+        user.setRole("ROLE_ADMIN");
 
-        userRepository.save(data);
+        userRepository.save(user);
 
         return new ResponseDTO<>(HttpStatus.CREATED.value(), "회원가입 성공", null);
     }

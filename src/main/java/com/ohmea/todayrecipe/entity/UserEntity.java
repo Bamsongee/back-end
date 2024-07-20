@@ -23,9 +23,9 @@ public class UserEntity {
     // 요리 실력
     private CookingSkillEnum cookingSkill;
     // 예산
-    private Integer CookingBudget;
+    private Integer cookingBudget;
     // 맞춤 필터링 제공
-    private boolean customFilter;
+    private String filter;
     // admin
     private String role;
 }
