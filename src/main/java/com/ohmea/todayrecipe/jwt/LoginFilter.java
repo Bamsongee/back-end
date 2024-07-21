@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ohmea.todayrecipe.dto.response.ErrorResponseDTO;
 import com.ohmea.todayrecipe.dto.response.ResponseDTO;
 import com.ohmea.todayrecipe.dto.user.CustomUserDetails;
+import com.ohmea.todayrecipe.entity.RefreshEntity;
+import com.ohmea.todayrecipe.repository.AuthRepositoryWithRedis;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -25,6 +27,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
     private final JWTUtil jwtUtil;
+    private final AuthRepositoryWithRedis authRepositoryWithRedis;
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
@@ -55,6 +58,9 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         String accesstoken = jwtUtil.createJwt("accessToken", username, role, 86400000L);
         String refreshToken = jwtUtil.createJwt("refreshToken", username, role, 86400000L);
+
+        RefreshEntity refreshEntity = new RefreshEntity(refreshToken, username);
+        authRepositoryWithRedis.save(refreshEntity);
 
         response.addHeader("accessToken", "Bearer " + accesstoken);
         response.addHeader("refreshToken", "Bearer " + refreshToken);
