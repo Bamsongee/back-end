@@ -5,6 +5,7 @@ import com.ohmea.todayrecipe.dto.response.ErrorResponseDTO;
 import com.ohmea.todayrecipe.dto.response.ResponseDTO;
 import com.ohmea.todayrecipe.entity.RefreshEntity;
 import com.ohmea.todayrecipe.repository.RefreshRedisRepository;
+import com.ohmea.todayrecipe.util.TokenErrorResponse;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -17,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -46,12 +48,11 @@ public class CustomLogoutFilter extends GenericFilterBean {
             return;
         }
 
-        String errorMessage = null;
-
         // refresh token
         String refreshToken = request.getHeader("refresh");
+
         if (refreshToken == null) {
-            errorMessage = "헤더에 refresh 토큰이 없음";
+            TokenErrorResponse.sendErrorResponse(response, "헤더에 refresh 토큰이 없습니다.");
             return;
         }
 
@@ -59,32 +60,21 @@ public class CustomLogoutFilter extends GenericFilterBean {
         try {
             jwtUtil.isExpired(refreshToken);
         } catch (ExpiredJwtException e) {
-            errorMessage = "토큰 만료됨";
+            TokenErrorResponse.sendErrorResponse(response, "토큰이 만료되었습니다.");
             return;
         }
 
         // 토큰이 refresh인지 확인 (발급시 페이로드에 명시)
         String category = jwtUtil.getType(refreshToken);
         if (!category.equals("refreshToken")) {
-            errorMessage = "토큰이 refresh 토큰이 아님";
+            TokenErrorResponse.sendErrorResponse(response, "refresh 토큰이 아닙니다.");
             return;
         }
 
         // redis에 저장되어 있는지 확인
         Optional<RefreshEntity> isExist = refreshRedisRepository.findById(refreshToken);
         if (isExist.isEmpty()) {
-            errorMessage = "토큰이 DB에 존재하지 않음";
-        }
-
-        if (errorMessage != null) {
-            ErrorResponseDTO responseDTO = new ErrorResponseDTO(HttpServletResponse.SC_BAD_REQUEST, errorMessage);
-
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-            ObjectMapper objectMapper = new ObjectMapper();
-            String jsonResponse = objectMapper.writeValueAsString(responseDTO);
-            response.getWriter().write(jsonResponse);
-            return;
+            TokenErrorResponse.sendErrorResponse(response, "토큰이 DB에 존재하지 않습니다.");
         }
 
         //로그아웃 진행
@@ -98,7 +88,10 @@ public class CustomLogoutFilter extends GenericFilterBean {
         response.setCharacterEncoding("UTF-8");
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonResponse = objectMapper.writeValueAsString(responseDTO);
-        response.getWriter().write(jsonResponse);
+        PrintWriter writer = response.getWriter();
+        writer.print(jsonResponse);
+        writer.flush();
+        writer.close();
     }
 
 }

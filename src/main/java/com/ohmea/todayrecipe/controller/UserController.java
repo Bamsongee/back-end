@@ -11,6 +11,7 @@ import com.ohmea.todayrecipe.exception.TokenNotFoundException;
 import com.ohmea.todayrecipe.jwt.JWTUtil;
 import com.ohmea.todayrecipe.repository.RefreshRedisRepository;
 import com.ohmea.todayrecipe.service.UserService;
+import com.ohmea.todayrecipe.util.TokenErrorResponse;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,6 +23,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.Optional;
 
 @RestController
@@ -48,28 +50,28 @@ public class UserController {
     }
 
     @PostMapping("/reissue")
-    public ResponseEntity<ResponseDTO> reissue(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<ResponseDTO> reissue(HttpServletRequest request, HttpServletResponse response) throws IOException {
         // 헤더에서 refresh키에 담긴 토큰을 꺼냄
         String refreshToken = request.getHeader("refresh");
 
         if (refreshToken == null) {
-            throw new TokenNotFoundException("헤더에서 토큰을 찾을 수 없습니다.");
+            TokenErrorResponse.sendErrorResponse(response, "헤더에서 토큰을 찾을 수 없습니다.");
         }
 
         try {
             jwtUtil.isExpired(refreshToken);
         } catch (ExpiredJwtException e) {
-            throw new AccessTokenExpiredException("access 토큰이 만료되었습니다.");
+            TokenErrorResponse.sendErrorResponse(response, "access 토큰이 만료되었습니다.");
         }
 
         String type = jwtUtil.getType(refreshToken);
         if (!type.equals("refreshToken")) {
-            throw new NotRefreshTokenException("refesh token이 아닙니다.");
+            TokenErrorResponse.sendErrorResponse(response, "refesh token이 아닙니다.");
         }
 
         Optional<RefreshEntity> isExist = refreshRedisRepository.findById(refreshToken);
         if (isExist.isEmpty()) {
-            throw new RuntimeException("토큰이 만료되었습니다.");
+            TokenErrorResponse.sendErrorResponse(response, "토큰이 만료되었습니다.");
         }
 
         String username = jwtUtil.getUsername(refreshToken);
