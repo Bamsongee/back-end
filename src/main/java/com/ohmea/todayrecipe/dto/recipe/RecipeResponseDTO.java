@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RecipeResponseDTO {
-    // 추후 필드 수정
     private String ranking;
     private String name;
     private String link;
@@ -33,7 +32,7 @@ public class RecipeResponseDTO {
                 .recipe(recipeEntity.getRecipe())
                 .serving(recipeEntity.getServing())
                 .time(recipeEntity.getTime())
-                .difficulty(recipeEntity.getTime())
+                .difficulty(recipeEntity.getDifficulty())
                 .build();
     }
 }
