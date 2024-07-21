@@ -9,13 +9,12 @@ import com.ohmea.todayrecipe.exception.AccessTokenExpiredException;
 import com.ohmea.todayrecipe.exception.NotRefreshTokenException;
 import com.ohmea.todayrecipe.exception.TokenNotFoundException;
 import com.ohmea.todayrecipe.jwt.JWTUtil;
-import com.ohmea.todayrecipe.repository.AuthRepositoryWithRedis;
+import com.ohmea.todayrecipe.repository.RefreshRedisRepository;
 import com.ohmea.todayrecipe.service.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -31,7 +30,7 @@ public class UserController {
 
     private final UserService userService;
     private final JWTUtil jwtUtil;
-    private final AuthRepositoryWithRedis authRepositoryWithRedis;
+    private final RefreshRedisRepository refreshRedisRepository;
 
     @GetMapping("/")
     public ResponseDTO<String> init(){
@@ -68,7 +67,7 @@ public class UserController {
             throw new NotRefreshTokenException("refesh token이 아닙니다.");
         }
 
-        Optional<RefreshEntity> isExist = authRepositoryWithRedis.findById(refreshToken);
+        Optional<RefreshEntity> isExist = refreshRedisRepository.findById(refreshToken);
         if (isExist.isEmpty()) {
             throw new RuntimeException("토큰이 만료되었습니다.");
         }
@@ -83,9 +82,9 @@ public class UserController {
         response.setHeader("accessToken", "Bearer " + newAccessToken);
         response.setHeader("refreshToken", "Bearer " + newRefreshToken);
 
-        authRepositoryWithRedis.deleteById(refreshToken);
+        refreshRedisRepository.deleteById(refreshToken);
         RefreshEntity refreshEntity = new RefreshEntity(newRefreshToken, username);
-        authRepositoryWithRedis.save(refreshEntity);
+        refreshRedisRepository.save(refreshEntity);
 
         return ResponseEntity
                 .status(HttpStatus.OK.value())
@@ -94,7 +93,6 @@ public class UserController {
 
     /**
      * 마이페이지 조회
-     * @return
      */
     @GetMapping("/mypage")
     public ResponseEntity<ResponseDTO<UserResponseDTO>> mypage() {

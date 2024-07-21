@@ -1,10 +1,10 @@
 package com.ohmea.todayrecipe.config;
 
+import com.ohmea.todayrecipe.jwt.CustomLogoutFilter;
 import com.ohmea.todayrecipe.jwt.JWTFilter;
 import com.ohmea.todayrecipe.jwt.JWTUtil;
 import com.ohmea.todayrecipe.jwt.LoginFilter;
-import com.ohmea.todayrecipe.repository.AuthRepositoryWithRedis;
-import lombok.AllArgsConstructor;
+import com.ohmea.todayrecipe.repository.RefreshRedisRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,6 +16,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -24,7 +25,7 @@ public class SecurityConfig {
 
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JWTUtil jwtUtil;
-    private final AuthRepositoryWithRedis authRepositoryWithRedis;
+    private final RefreshRedisRepository refreshRedisRepository;
 
 
     @Bean
@@ -63,7 +64,10 @@ public class SecurityConfig {
         http
                 .addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class);
         http
-                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, authRepositoryWithRedis), UsernamePasswordAuthenticationFilter.class);
+                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, refreshRedisRepository), UsernamePasswordAuthenticationFilter.class);
+
+        http
+                .addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshRedisRepository), LogoutFilter.class);
 
         //세션 설정
         http

@@ -5,7 +5,7 @@ import com.ohmea.todayrecipe.dto.response.ErrorResponseDTO;
 import com.ohmea.todayrecipe.dto.response.ResponseDTO;
 import com.ohmea.todayrecipe.dto.user.CustomUserDetails;
 import com.ohmea.todayrecipe.entity.RefreshEntity;
-import com.ohmea.todayrecipe.repository.AuthRepositoryWithRedis;
+import com.ohmea.todayrecipe.repository.RefreshRedisRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -27,7 +27,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
     private final JWTUtil jwtUtil;
-    private final AuthRepositoryWithRedis authRepositoryWithRedis;
+    private final RefreshRedisRepository authRepositoryWithRedis;
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
