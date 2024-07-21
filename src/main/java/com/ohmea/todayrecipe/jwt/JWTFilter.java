@@ -3,6 +3,7 @@ package com.ohmea.todayrecipe.jwt;
 import com.ohmea.todayrecipe.dto.user.CustomUserDetails;
 import com.ohmea.todayrecipe.entity.UserEntity;
 import com.ohmea.todayrecipe.exception.NotRefreshTokenException;
+import com.ohmea.todayrecipe.util.TokenErrorResponse;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,7 +30,6 @@ public class JWTFilter extends OncePerRequestFilter {
         //Authorization 헤더 검증
         if (authorization == null || !authorization.startsWith("Bearer ")) {
 
-            System.out.println("token null");
             filterChain.doFilter(request, response);
 
             //조건이 해당되면 메소드 종료 (필수)
@@ -40,8 +40,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
         //토큰 소멸 시간 검증
         if (jwtUtil.isExpired(token)) {
-
-            System.out.println("token expired");
+            TokenErrorResponse.sendErrorResponse(response, "토큰이 만료되었습니다.");
             filterChain.doFilter(request, response);
 
             //조건이 해당되면 메소드 종료 (필수)
@@ -51,7 +50,8 @@ public class JWTFilter extends OncePerRequestFilter {
         // access token을 입력했는지 확인
         String type = jwtUtil.getType(token);
         if (!type.equals("accessToken")) {
-            throw new NotRefreshTokenException("accessToken이 아닙니다.");
+            TokenErrorResponse.sendErrorResponse(response, "access token이 아닙니다.");
+
         }
 
         String username = jwtUtil.getUsername(token);

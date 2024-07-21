@@ -4,16 +4,18 @@ import com.ohmea.todayrecipe.dto.response.ResponseDTO;
 import com.ohmea.todayrecipe.dto.user.JoinDTO;
 import com.ohmea.todayrecipe.dto.user.UpdateUserDTO;
 import com.ohmea.todayrecipe.dto.user.UserResponseDTO;
+import com.ohmea.todayrecipe.entity.RefreshEntity;
 import com.ohmea.todayrecipe.exception.AccessTokenExpiredException;
 import com.ohmea.todayrecipe.exception.NotRefreshTokenException;
 import com.ohmea.todayrecipe.exception.TokenNotFoundException;
 import com.ohmea.todayrecipe.jwt.JWTUtil;
+import com.ohmea.todayrecipe.repository.RefreshRedisRepository;
 import com.ohmea.todayrecipe.service.UserService;
+import com.ohmea.todayrecipe.util.TokenErrorResponse;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -21,12 +23,16 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.util.Optional;
+
 @RestController
 @RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
     private final JWTUtil jwtUtil;
+    private final RefreshRedisRepository refreshRedisRepository;
 
     @GetMapping("/")
     public ResponseDTO<String> init(){
@@ -44,23 +50,28 @@ public class UserController {
     }
 
     @PostMapping("/reissue")
-    public ResponseEntity<ResponseDTO> reissue(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<ResponseDTO> reissue(HttpServletRequest request, HttpServletResponse response) throws IOException {
         // 헤더에서 refresh키에 담긴 토큰을 꺼냄
         String refreshToken = request.getHeader("refresh");
 
         if (refreshToken == null) {
-            throw new TokenNotFoundException("헤더에서 토큰을 찾을 수 없습니다.");
+            TokenErrorResponse.sendErrorResponse(response, "헤더에서 토큰을 찾을 수 없습니다.");
         }
 
         try {
             jwtUtil.isExpired(refreshToken);
         } catch (ExpiredJwtException e) {
-            throw new AccessTokenExpiredException("access 토큰이 만료되었습니다.");
+            TokenErrorResponse.sendErrorResponse(response, "access 토큰이 만료되었습니다.");
         }
 
         String type = jwtUtil.getType(refreshToken);
         if (!type.equals("refreshToken")) {
-            throw new NotRefreshTokenException("refesh token이 아닙니다.");
+            TokenErrorResponse.sendErrorResponse(response, "refesh token이 아닙니다.");
+        }
+
+        Optional<RefreshEntity> isExist = refreshRedisRepository.findById(refreshToken);
+        if (isExist.isEmpty()) {
+            TokenErrorResponse.sendErrorResponse(response, "토큰이 만료되었습니다.");
         }
 
         String username = jwtUtil.getUsername(refreshToken);
@@ -73,6 +84,10 @@ public class UserController {
         response.setHeader("accessToken", "Bearer " + newAccessToken);
         response.setHeader("refreshToken", "Bearer " + newRefreshToken);
 
+        refreshRedisRepository.deleteById(refreshToken);
+        RefreshEntity refreshEntity = new RefreshEntity(newRefreshToken, username);
+        refreshRedisRepository.save(refreshEntity);
+
         return ResponseEntity
                 .status(HttpStatus.OK.value())
                 .body(new ResponseDTO<>(200, "accessToken 재발급 완료. 헤더를 확인하세요.", null));
@@ -80,7 +95,6 @@ public class UserController {
 
     /**
      * 마이페이지 조회
-     * @return
      */
     @GetMapping("/mypage")
     public ResponseEntity<ResponseDTO<UserResponseDTO>> mypage() {
@@ -105,5 +119,4 @@ public class UserController {
                 .status(HttpStatus.OK.value())
                 .body(new ResponseDTO<UserResponseDTO>(200, "user 수정이 완료되었습니다.", userResponseDTO));
     }
-
 }
