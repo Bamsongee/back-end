@@ -1,7 +1,6 @@
 package com.ohmea.todayrecipe.service;
 
 import com.ohmea.todayrecipe.dto.recipe.RecipeResponseDTO;
-import com.ohmea.todayrecipe.entity.ProductEntity;
 import com.ohmea.todayrecipe.entity.RecipeEntity;
 import com.ohmea.todayrecipe.repository.RecipeRepository;
 import com.ohmea.todayrecipe.util.CsvReader;
@@ -20,7 +19,8 @@ public class RecipeService {
     @Autowired
     private RecipeRepository recipeRepository;
 
-    @Autowired private CsvReader csvReader;
+    @Autowired
+    private CsvReader csvReader;
     private static final String CSV_FILE_PATH = "static/recipe_entity.csv";
 
     @PostConstruct
@@ -30,8 +30,18 @@ public class RecipeService {
     }
 
     public List<RecipeResponseDTO> getAllRecipes() {
-
         List<RecipeEntity> recipeEntities = recipeRepository.findAll();
+        List<RecipeResponseDTO> recipeResponseDTOList = new ArrayList<>();
+
+        recipeEntities.forEach(entity -> {
+            recipeResponseDTOList.add(RecipeResponseDTO.toDto(entity));
+        });
+
+        return recipeResponseDTOList;
+    }
+
+    public List<RecipeResponseDTO> searchRecipesByName(String name) {
+        List<RecipeEntity> recipeEntities = recipeRepository.findByNameContainingIgnoreCase(name);
         List<RecipeResponseDTO> recipeResponseDTOList = new ArrayList<>();
 
         recipeEntities.forEach(entity -> {
