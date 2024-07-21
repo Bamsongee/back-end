@@ -1,6 +1,7 @@
 package com.ohmea.todayrecipe.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ohmea.todayrecipe.dto.response.ErrorResponseDTO;
 import com.ohmea.todayrecipe.dto.response.ResponseDTO;
 import com.ohmea.todayrecipe.entity.RefreshEntity;
 import com.ohmea.todayrecipe.repository.RefreshRedisRepository;
@@ -45,13 +46,12 @@ public class CustomLogoutFilter extends GenericFilterBean {
             return;
         }
 
+        String errorMessage = null;
+
         // refresh token
         String refreshToken = request.getHeader("refresh");
         if (refreshToken == null) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-            response.getWriter().write("헤더에 refresh 토큰이 없음");
+            errorMessage = "헤더에 refresh 토큰이 없음";
             return;
         }
 
@@ -59,30 +59,31 @@ public class CustomLogoutFilter extends GenericFilterBean {
         try {
             jwtUtil.isExpired(refreshToken);
         } catch (ExpiredJwtException e) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-            response.getWriter().write("토큰 만료됨");
+            errorMessage = "토큰 만료됨";
             return;
         }
 
         // 토큰이 refresh인지 확인 (발급시 페이로드에 명시)
         String category = jwtUtil.getType(refreshToken);
         if (!category.equals("refreshToken")) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-            response.getWriter().write("토큰이 refresh 토큰이 아님");
+            errorMessage = "토큰이 refresh 토큰이 아님";
             return;
         }
 
-        // DB에 저장되어 있는지 확인
+        // redis에 저장되어 있는지 확인
         Optional<RefreshEntity> isExist = refreshRedisRepository.findById(refreshToken);
         if (isExist.isEmpty()) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            errorMessage = "토큰이 DB에 존재하지 않음";
+        }
+
+        if (errorMessage != null) {
+            ErrorResponseDTO responseDTO = new ErrorResponseDTO(HttpServletResponse.SC_BAD_REQUEST, errorMessage);
+
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
-            response.getWriter().write("토큰이 DB에 존재하지 않음");
+            ObjectMapper objectMapper = new ObjectMapper();
+            String jsonResponse = objectMapper.writeValueAsString(responseDTO);
+            response.getWriter().write(jsonResponse);
             return;
         }
 
