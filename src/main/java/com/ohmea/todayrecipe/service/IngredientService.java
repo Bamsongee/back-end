@@ -1,5 +1,6 @@
 package com.ohmea.todayrecipe.service;
 
+import com.ohmea.todayrecipe.dto.ingredient.CreateIngredientDTO;
 import com.ohmea.todayrecipe.dto.ingredient.IngredientResponseDTO;
 import com.ohmea.todayrecipe.entity.IngredientEntity;
 import com.ohmea.todayrecipe.entity.UserEntity;
@@ -8,6 +9,7 @@ import com.ohmea.todayrecipe.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,5 +33,19 @@ public class IngredientService {
         });
 
         return ingredientResponseDTOList;
+    }
+
+    @Transactional
+    public void createIngredient(String username, CreateIngredientDTO createIngredientDTO) {
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("해당 사용자 이름을 가진 사용자를 찾을 수 없습니다: " + username));
+
+        IngredientEntity ingredientEntity = IngredientEntity.builder()
+                .ingredient(createIngredientDTO.getIngredient())
+                .count(createIngredientDTO.getCount())
+                .user(user)
+                .build();
+
+        ingredientRepository.save(ingredientEntity);
     }
 }
