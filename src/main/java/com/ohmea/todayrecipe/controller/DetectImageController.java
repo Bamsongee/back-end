@@ -6,6 +6,7 @@ import com.ohmea.todayrecipe.service.DetectImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,7 +22,10 @@ public class DetectImageController {
     @PostMapping
     public ResponseEntity<ResponseDTO> getDetectImage(
             @RequestParam("file") MultipartFile file) {
-        DetectImageResponseDTO response = detectImageService.getDetectedImage(file);
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        DetectImageResponseDTO response = detectImageService.getDetectedImage(username, file);
+
         return ResponseEntity
                 .status(HttpStatus.OK.value())
                 .body(new ResponseDTO(200, "사진 분석 완료", response));
