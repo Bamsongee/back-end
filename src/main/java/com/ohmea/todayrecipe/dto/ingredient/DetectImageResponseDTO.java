@@ -1,4 +1,4 @@
-package com.ohmea.todayrecipe.dto.detectimage;
+package com.ohmea.todayrecipe.dto.ingredient;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

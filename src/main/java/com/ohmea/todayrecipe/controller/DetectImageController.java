@@ -1,6 +1,6 @@
 package com.ohmea.todayrecipe.controller;
 
-import com.ohmea.todayrecipe.dto.detectimage.DetectImageResponseDTO;
+import com.ohmea.todayrecipe.dto.ingredient.DetectImageResponseDTO;
 import com.ohmea.todayrecipe.dto.response.ResponseDTO;
 import com.ohmea.todayrecipe.service.DetectImageService;
 import lombok.RequiredArgsConstructor;
