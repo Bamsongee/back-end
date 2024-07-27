@@ -3,6 +3,9 @@ package com.ohmea.todayrecipe.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Builder
 @Getter
@@ -12,7 +15,7 @@ public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     // 닉네임
     private String username;
@@ -30,6 +33,9 @@ public class UserEntity {
     private String filter;
     // admin
     private String role;
+    // refrigerator 식재료들
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<IngredientEntity> ingredients = new ArrayList<>();
 
     // user 정보 업데이트
     public void updateUser(CookingSkillEnum cookingSkill, Integer cookingBudget, String filter) {

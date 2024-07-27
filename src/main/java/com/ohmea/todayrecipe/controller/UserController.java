@@ -98,10 +98,7 @@ public class UserController {
      */
     @GetMapping("/mypage")
     public ResponseEntity<ResponseDTO<UserResponseDTO>> mypage() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Object principal = authentication.getPrincipal();
-        String username = ((UserDetails) principal).getUsername();
-
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
         UserResponseDTO userResponseDTO = userService.getUserInfo(username);
         return ResponseEntity
                 .status(HttpStatus.OK.value())

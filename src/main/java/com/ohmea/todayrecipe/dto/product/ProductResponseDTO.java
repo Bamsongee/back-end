@@ -14,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProductResponseDTO {
-    private int id;
+    private Long id;
     private String image;
     private String title;
     private String description;
