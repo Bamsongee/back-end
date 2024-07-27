@@ -4,6 +4,7 @@ import com.ohmea.todayrecipe.dto.ingredient.CreateIngredientDTO;
 import com.ohmea.todayrecipe.dto.ingredient.IngredientResponseDTO;
 import com.ohmea.todayrecipe.entity.IngredientEntity;
 import com.ohmea.todayrecipe.entity.UserEntity;
+import com.ohmea.todayrecipe.exception.IngredientNotFoundException;
 import com.ohmea.todayrecipe.repository.IngredientRepository;
 import com.ohmea.todayrecipe.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -47,5 +48,13 @@ public class IngredientService {
                 .build();
 
         ingredientRepository.save(ingredientEntity);
+    }
+
+    @Transactional
+    public void deleteIngredient(Long id) {
+        IngredientEntity ingredient = ingredientRepository.findById(id)
+                .orElseThrow(() -> new IngredientNotFoundException("해당 id의 식재료 데이터를 찾을 수 없습니다."));
+
+        ingredientRepository.delete(ingredient);
     }
 }

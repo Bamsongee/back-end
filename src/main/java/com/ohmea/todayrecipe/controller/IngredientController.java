@@ -37,4 +37,12 @@ public class IngredientController {
                 .status(HttpStatus.OK.value())
                 .body(new ResponseDTO(200, "냉장고 데이터 추가 완료", null));
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ResponseDTO> deleteIngredient(@PathVariable("id") Long id) {
+        ingredientService.deleteIngredient(id);
+        return ResponseEntity
+                .status(HttpStatus.OK.value())
+                .body(new ResponseDTO(200, "냉장고 데이터 삭제 완료", null));
+    }
 }
