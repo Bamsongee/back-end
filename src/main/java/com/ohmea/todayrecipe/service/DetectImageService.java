@@ -1,6 +1,7 @@
 package com.ohmea.todayrecipe.service;
 
 import com.ohmea.todayrecipe.dto.ingredient.DetectImageResponseDTO;
+import com.ohmea.todayrecipe.dto.ingredient.IngredientExistsResponseDTO;
 import com.ohmea.todayrecipe.entity.IngredientEntity;
 import com.ohmea.todayrecipe.entity.UserEntity;
 import com.ohmea.todayrecipe.repository.IngredientRepository;
@@ -15,6 +16,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -23,7 +25,7 @@ import java.util.List;
 public class DetectImageService {
     private final RestTemplate restTemplate;
     private final UserRepository userRepository;
-    private final IngredientRepository refrigeratorRepository;
+    private final IngredientRepository ingredientRepository;
 
     @Transactional
     public DetectImageResponseDTO getDetectedImage(String username, MultipartFile file) {
@@ -43,18 +45,25 @@ public class DetectImageService {
         ResponseEntity<String[]> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String[].class);
 
         List<String> detectedItems = Arrays.asList(response.getBody());
+        List<IngredientExistsResponseDTO> ingredientExistsResponseDTOS = new ArrayList<>();
 
         detectedItems.forEach(item -> {
-            IngredientEntity refrigeratorEntity = IngredientEntity.builder()
-                    .ingredient(item)
-                    .user(user)
-                    .build();
+            boolean isExists = ingredientRepository.existsByIngredient(item);
+            if(!isExists) {
+                IngredientEntity refrigeratorEntity = IngredientEntity.builder()
+                        .ingredient(item)
+                        .user(user)
+                        .build();
 
-            refrigeratorRepository.save(refrigeratorEntity);
+                ingredientRepository.save(refrigeratorEntity);
+            }
+
+            ingredientExistsResponseDTOS.add(new IngredientExistsResponseDTO(item, isExists));
+
         });
 
         return DetectImageResponseDTO.builder()
-                .ingredients(detectedItems)
+                .results(ingredientExistsResponseDTOS)
                 .build();
     }
 }
