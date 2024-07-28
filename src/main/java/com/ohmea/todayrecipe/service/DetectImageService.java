@@ -47,7 +47,6 @@ public class DetectImageService {
         detectedItems.forEach(item -> {
             IngredientEntity refrigeratorEntity = IngredientEntity.builder()
                     .ingredient(item)
-                    .count(1) // 사용자가 추후 변경할 수 있도록 해야 함
                     .user(user)
                     .build();
 

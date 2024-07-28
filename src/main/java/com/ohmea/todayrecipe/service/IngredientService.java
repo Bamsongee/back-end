@@ -43,7 +43,6 @@ public class IngredientService {
 
         IngredientEntity ingredientEntity = IngredientEntity.builder()
                 .ingredient(createIngredientDTO.getIngredient())
-                .count(createIngredientDTO.getCount())
                 .user(user)
                 .build();
 
