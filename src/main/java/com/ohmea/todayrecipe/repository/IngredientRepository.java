@@ -10,4 +10,5 @@ import java.util.List;
 @Repository
 public interface IngredientRepository extends JpaRepository<IngredientEntity, Long> {
     List<IngredientEntity> findByUser(UserEntity user);
+    Boolean existsByIngredient(String ingredient);
 }

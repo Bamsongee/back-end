@@ -32,10 +32,10 @@ public class IngredientController {
     public ResponseEntity<ResponseDTO> createIngredient(@RequestBody CreateIngredientDTO createIngredientDTO) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        ingredientService.createIngredient(username, createIngredientDTO);
+        String message = ingredientService.createIngredient(username, createIngredientDTO);
         return ResponseEntity
                 .status(HttpStatus.OK.value())
-                .body(new ResponseDTO(200, "냉장고 데이터 추가 완료", null));
+                .body(new ResponseDTO(200, message, null));
     }
 
     @DeleteMapping("/{id}")

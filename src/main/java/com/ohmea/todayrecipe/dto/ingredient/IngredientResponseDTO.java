@@ -16,13 +16,11 @@ import java.util.List;
 public class IngredientResponseDTO {
     private Long id;
     private String ingredients;
-    private Integer count;
 
     public static IngredientResponseDTO toDto(IngredientEntity entity) {
         return IngredientResponseDTO.builder()
                 .id(entity.getId())
                 .ingredients(entity.getIngredient())
-                .count(entity.getCount())
                 .build();
     }
 }

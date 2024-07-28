@@ -13,5 +13,5 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DetectImageResponseDTO {
-    private List<String> ingredients = new ArrayList<>();
+    private List<IngredientExistsResponseDTO> results = new ArrayList<>();
 }

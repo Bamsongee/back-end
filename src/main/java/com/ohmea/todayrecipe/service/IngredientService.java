@@ -37,17 +37,23 @@ public class IngredientService {
     }
 
     @Transactional
-    public void createIngredient(String username, CreateIngredientDTO createIngredientDTO) {
+    public String createIngredient(String username, CreateIngredientDTO createIngredientDTO) {
         UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 사용자 이름을 가진 사용자를 찾을 수 없습니다: " + username));
 
-        IngredientEntity ingredientEntity = IngredientEntity.builder()
-                .ingredient(createIngredientDTO.getIngredient())
-                .count(createIngredientDTO.getCount())
-                .user(user)
-                .build();
+        String ingredient = createIngredientDTO.getIngredient();
+        boolean isExists = ingredientRepository.existsByIngredient(ingredient);
 
-        ingredientRepository.save(ingredientEntity);
+        if(!isExists) {
+            IngredientEntity ingredientEntity = IngredientEntity.builder()
+                    .ingredient(ingredient)
+                    .user(user)
+                    .build();
+
+            ingredientRepository.save(ingredientEntity);
+            return ingredient + "가 성공적으로 저장되었습니다.";
+        }
+        return ingredient + "가 이미 냉장고에 존재합니다.";
     }
 
     @Transactional
