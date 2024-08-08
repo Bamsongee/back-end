@@ -117,11 +117,9 @@ public class UserService {
 
     // 찜 레시피 조회
     public List<RecipeResponseDTO> getLikedRecipes(String username) {
-        // User 엔티티를 데이터베이스에서 조회
         UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 사용자 이름을 가진 사용자를 찾을 수 없습니다: " + username));
 
-        // 사용자가 찜한 레시피 목록을 가져와 RecipeResponseDTO로 변환
         return user.getLikes().stream()
                 .map(like -> RecipeResponseDTO.toDto(like.getRecipe()))
                 .collect(Collectors.toList());
