@@ -2,6 +2,7 @@ package com.ohmea.todayrecipe.dto.recipe;
 
 import com.ohmea.todayrecipe.entity.RecipeEntity;
 import jakarta.persistence.Column;
+import com.ohmea.todayrecipe.repository.RecipeRepository;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
