@@ -1,8 +1,6 @@
 package com.ohmea.todayrecipe.dto.recipe;
 
 import com.ohmea.todayrecipe.entity.RecipeEntity;
-import jakarta.persistence.Column;
-import com.ohmea.todayrecipe.repository.RecipeRepository;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,6 +20,8 @@ public class RecipeResponseDTO {
     private String serving;
     private String time;
     private String difficulty;
+    private String keyword;
+    private String category;
 
     public static RecipeResponseDTO toDto(RecipeEntity recipeEntity) {
         return RecipeResponseDTO.builder()
@@ -34,6 +34,8 @@ public class RecipeResponseDTO {
                 .serving(recipeEntity.getServing())
                 .time(recipeEntity.getTime())
                 .difficulty(recipeEntity.getDifficulty())
+                .keyword(recipeEntity.getKeyword())
+                .category(recipeEntity.getCategory())
                 .build();
     }
 }

@@ -23,4 +23,6 @@ public class RecipeEntity {
     private String serving;
     private String time;
     private String difficulty;
+    private String keyword;
+    private String category;
 }
