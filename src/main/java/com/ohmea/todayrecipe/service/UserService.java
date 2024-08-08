@@ -1,13 +1,14 @@
 package com.ohmea.todayrecipe.service;
 
+import com.ohmea.todayrecipe.dto.recipe.RecipeResponseDTO;
 import com.ohmea.todayrecipe.dto.response.ResponseDTO;
 import com.ohmea.todayrecipe.dto.user.JoinDTO;
 import com.ohmea.todayrecipe.dto.user.UpdateUserDTO;
 import com.ohmea.todayrecipe.dto.user.UserResponseDTO;
-import com.ohmea.todayrecipe.entity.CookingSkillEnum;
-import com.ohmea.todayrecipe.entity.GenderEnum;
-import com.ohmea.todayrecipe.entity.UserEntity;
+import com.ohmea.todayrecipe.entity.*;
 import com.ohmea.todayrecipe.exception.EntityDuplicatedException;
+import com.ohmea.todayrecipe.repository.LikeRepository;
+import com.ohmea.todayrecipe.repository.RecipeRepository;
 import com.ohmea.todayrecipe.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,14 +16,20 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class UserService {
     private final UserRepository userRepository;
+    private final RecipeRepository recipeRepository;
+    private final LikeRepository likeRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
-
+    public UserService(UserRepository userRepository, RecipeRepository recipeRepository, LikeRepository likeRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userRepository = userRepository;
+        this.recipeRepository = recipeRepository;
+        this.likeRepository = likeRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
@@ -89,5 +96,32 @@ public class UserService {
                 .cookingSkill(user.getCookingSkill())
                 .filter(user.getFilter())
                 .build();
+    }
+
+    // 레시피 찜
+    @Transactional
+    public ResponseDTO<String> likeRecipe(String username, String ranking) {
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("해당 사용자 이름을 가진 사용자를 찾을 수 없습니다: " + username));
+        RecipeEntity recipe = recipeRepository.findById(ranking)
+                .orElseThrow(() -> new IllegalArgumentException("해당 레시피를 찾을 수 없습니다: " + ranking));
+
+        LikeEntity like = LikeEntity.builder()
+                .user(user)
+                .recipe(recipe)
+                .build();
+        likeRepository.save(like);
+
+        return new ResponseDTO<>(HttpStatus.OK.value(), "레시피 찜이 완료되었습니다.", null);
+    }
+
+    // 찜 레시피 조회
+    public List<RecipeResponseDTO> getLikedRecipes(String username) {
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("해당 사용자 이름을 가진 사용자를 찾을 수 없습니다: " + username));
+
+        return user.getLikes().stream()
+                .map(like -> RecipeResponseDTO.toDto(like.getRecipe()))
+                .collect(Collectors.toList());
     }
 }
