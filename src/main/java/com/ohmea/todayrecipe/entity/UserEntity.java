@@ -37,6 +37,9 @@ public class UserEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<IngredientEntity> ingredients = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<LikeEntity> likes = new ArrayList<>();
+
     // user 정보 업데이트
     public void updateUser(CookingSkillEnum cookingSkill, Integer cookingBudget, String filter) {
         this.cookingSkill = cookingSkill == null ? this.cookingSkill : cookingSkill;
