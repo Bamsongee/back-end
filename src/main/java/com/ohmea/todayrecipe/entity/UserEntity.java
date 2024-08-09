@@ -47,4 +47,7 @@ public class UserEntity {
         this.filter = filter == null ? this.filter : filter;
     }
 
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<CommentEntity> comments = new ArrayList<>();
+
 }

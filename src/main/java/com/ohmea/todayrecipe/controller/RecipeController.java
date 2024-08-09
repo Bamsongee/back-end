@@ -3,6 +3,7 @@ package com.ohmea.todayrecipe.controller;
 import com.ohmea.todayrecipe.dto.recipe.RecipeResponseDTO;
 import com.ohmea.todayrecipe.dto.response.ResponseDTO;
 import com.ohmea.todayrecipe.service.RecipeService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,10 +13,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/recipe")
+@RequiredArgsConstructor
 public class RecipeController {
-    @Autowired
-    private RecipeService recipeService;
 
+    private final RecipeService recipeService;
     @GetMapping
     public ResponseEntity<ResponseDTO<List<RecipeResponseDTO>>> getAllRecipes() {
         List<RecipeResponseDTO> response = recipeService.getAllRecipes();
@@ -53,5 +54,4 @@ public class RecipeController {
                 .status(HttpStatus.OK.value())
                 .body(new ResponseDTO<>(200, "레시피 상세 조회 완료", response));
     }
-
 }
