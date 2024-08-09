@@ -2,11 +2,14 @@ package com.ohmea.todayrecipe.service;
 
 import com.ohmea.todayrecipe.dto.recipe.RecipeResponseDTO;
 import com.ohmea.todayrecipe.entity.RecipeEntity;
+import com.ohmea.todayrecipe.entity.UserEntity;
 import com.ohmea.todayrecipe.repository.RecipeRepository;
+import com.ohmea.todayrecipe.repository.UserRepository;
 import com.ohmea.todayrecipe.util.CsvReader;
 import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -20,6 +23,9 @@ public class RecipeService {
 
     @Autowired
     private CsvReader csvReader;
+
+    @Autowired
+    private UserRepository userRepository;
     private static final String CSV_FILE_PATH = "static/recipe_entity.csv";
 
     @PostConstruct
@@ -99,11 +105,15 @@ public class RecipeService {
     }
 
     //레시피 세부 조회
-    public RecipeResponseDTO getRecipeByRanking(String ranking) {
+    public RecipeResponseDTO getRecipeByRanking(String ranking, String username) {
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("해당 사용자 이름을 가진 사용자를 찾을 수 없습니다: " + username));
+
         RecipeEntity recipeEntity = recipeRepository.findById(ranking).orElse(null);
         if (recipeEntity == null) {
             return null;
         }
+        recipeEntity.incrementViewCountByGender(user.getGender());
         return RecipeResponseDTO.toDto(recipeEntity);
     }
 
