@@ -41,10 +41,6 @@ public class RecipeController {
                 .body(new ResponseDTO<List<RecipeResponseDTO>>(200, "연관 레시피 조회 완료", response));
     }
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 31065fa96fca550a707f4d5003bc9f9af73749e2
     //레시피 세부 조회
     @GetMapping("/detail/{ranking}")
     public ResponseEntity<ResponseDTO<RecipeResponseDTO>> getRecipeDetail(@PathVariable String ranking) {
@@ -58,8 +54,4 @@ public class RecipeController {
                 .status(HttpStatus.OK.value())
                 .body(new ResponseDTO<>(200, "레시피 상세 조회 완료", response));
     }
-<<<<<<< HEAD
-=======
-
->>>>>>> 31065fa96fca550a707f4d5003bc9f9af73749e2
 }
