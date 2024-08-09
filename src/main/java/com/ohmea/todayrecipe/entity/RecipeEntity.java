@@ -33,10 +33,22 @@ public class RecipeEntity {
 
 
     @Column(nullable = false, columnDefinition = "int default 0")
-    private int viewCount;  // 조회수 필드 추가
+    private int manCount;
 
-    public void incrementViewCount() {
-        this.viewCount++;
+    @Column(nullable = false, columnDefinition = "int default 0")
+    private int womanCount;
+
+    @Column(nullable = false, columnDefinition = "int default 0")
+    private int totalCount;
+
+    public void incrementViewCountByGender(GenderEnum gender) {
+        if (gender == GenderEnum.MAN) {
+            this.manCount++;
+            this.totalCount++;
+        } else if (gender == GenderEnum.WOMAN) {
+            this.womanCount++;
+            this.totalCount++;
+        }
     }
 
     @OneToMany(mappedBy = "recipe", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
