@@ -28,6 +28,8 @@ public class RecipeEntity {
     private String difficulty;
     private String keyword;
     private String category;
+    private Integer oneBudget;
+    private Integer totalBudget;
 
 
     @Column(nullable = false, columnDefinition = "int default 0")

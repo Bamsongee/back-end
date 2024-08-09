@@ -57,5 +57,4 @@ public class RecipeController {
                 .status(HttpStatus.OK.value())
                 .body(new ResponseDTO<>(200, "레시피 상세 조회 완료", response));
     }
-
 }
