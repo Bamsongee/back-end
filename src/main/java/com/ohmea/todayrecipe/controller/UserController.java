@@ -1,5 +1,6 @@
 package com.ohmea.todayrecipe.controller;
 
+import com.ohmea.todayrecipe.dto.recipe.RecipeResponseDTO;
 import com.ohmea.todayrecipe.dto.response.ResponseDTO;
 import com.ohmea.todayrecipe.dto.user.JoinDTO;
 import com.ohmea.todayrecipe.dto.user.UpdateUserDTO;
@@ -24,6 +25,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -98,10 +100,7 @@ public class UserController {
      */
     @GetMapping("/mypage")
     public ResponseEntity<ResponseDTO<UserResponseDTO>> mypage() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Object principal = authentication.getPrincipal();
-        String username = ((UserDetails) principal).getUsername();
-
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
         UserResponseDTO userResponseDTO = userService.getUserInfo(username);
         return ResponseEntity
                 .status(HttpStatus.OK.value())
@@ -118,5 +117,25 @@ public class UserController {
         return ResponseEntity
                 .status(HttpStatus.OK.value())
                 .body(new ResponseDTO<UserResponseDTO>(200, "user 수정이 완료되었습니다.", userResponseDTO));
+    }
+
+    // 레시피 찜
+    @PostMapping("/recipe/like/{ranking}")
+    public ResponseEntity<ResponseDTO<String>> likeRecipe(@PathVariable String ranking) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        ResponseDTO<String> response = userService.likeRecipe(username, ranking);
+        return ResponseEntity
+                .status(HttpStatus.OK.value())
+                .body(response);
+    }
+
+    // 찜한 레시피 조회
+    @GetMapping("/like")
+    public ResponseEntity<ResponseDTO<List<RecipeResponseDTO>>> getLikedRecipes() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        List<RecipeResponseDTO> response = userService.getLikedRecipes(username);
+        return ResponseEntity
+                .status(HttpStatus.OK.value())
+                .body(new ResponseDTO<>(200, "찜한 레시피 조회가 완료되었습니다.", response));
     }
 }

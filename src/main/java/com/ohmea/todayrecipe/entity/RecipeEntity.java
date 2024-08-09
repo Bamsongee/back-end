@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -19,7 +20,6 @@ public class RecipeEntity {
     private String name;
     private String link;
     private String imgURL;
-    @Column(columnDefinition = "TEXT")
     private String ingredients;
     @Column(columnDefinition = "TEXT")
     private String recipe;
@@ -27,15 +27,6 @@ public class RecipeEntity {
     private String time;
     private String difficulty;
 
-
-    @Column(nullable = false, columnDefinition = "int default 0")
-    private int viewCount;  // 조회수 필드 추가
-
-    public void incrementViewCount() {
-        this.viewCount++;
-    }
-
     @OneToMany(mappedBy = "recipe", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @OrderBy("id asc") // 댓글 정렬
-    private List<CommentEntity> comments;
+    private List<CommentEntity> comments = new ArrayList<>();
 }

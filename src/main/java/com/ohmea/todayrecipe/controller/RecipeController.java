@@ -6,10 +6,7 @@ import com.ohmea.todayrecipe.service.RecipeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -41,6 +38,20 @@ public class RecipeController {
         return ResponseEntity
                 .status(HttpStatus.OK.value())
                 .body(new ResponseDTO<List<RecipeResponseDTO>>(200, "연관 레시피 조회 완료", response));
+    }
+
+    //레시피 세부 조회
+    @GetMapping("/detail/{ranking}")
+    public ResponseEntity<ResponseDTO<RecipeResponseDTO>> getRecipeDetail(@PathVariable String ranking) {
+        RecipeResponseDTO response = recipeService.getRecipeByRanking(ranking);
+        if (response == null) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND.value())
+                    .body(new ResponseDTO<>(404, "레시피를 찾을 수 없습니다.", null));
+        }
+        return ResponseEntity
+                .status(HttpStatus.OK.value())
+                .body(new ResponseDTO<>(200, "레시피 상세 조회 완료", response));
     }
 
 }
