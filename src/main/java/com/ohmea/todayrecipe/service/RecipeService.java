@@ -98,6 +98,14 @@ public class RecipeService {
         return uniqueIngredients1.size();
     }
 
+    //레시피 세부 조회
+    public RecipeResponseDTO getRecipeByRanking(String ranking) {
+        RecipeEntity recipeEntity = recipeRepository.findById(ranking).orElse(null);
+        if (recipeEntity == null) {
+            return null;
+        }
+        return RecipeResponseDTO.toDto(recipeEntity);
+    }
 
 
 }
