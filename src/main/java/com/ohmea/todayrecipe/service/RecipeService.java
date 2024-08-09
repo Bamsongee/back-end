@@ -28,6 +28,7 @@ public class RecipeService {
         recipeRepository.saveAll(recipes);
     }
 
+
     public List<RecipeResponseDTO> getAllRecipes() {
         List<RecipeEntity> recipeEntities = recipeRepository.findAll();
         List<RecipeResponseDTO> recipeResponseDTOList = new ArrayList<>();
