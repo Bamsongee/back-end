@@ -16,7 +16,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -106,6 +108,11 @@ public class UserService {
         RecipeEntity recipe = recipeRepository.findById(ranking)
                 .orElseThrow(() -> new IllegalArgumentException("해당 레시피를 찾을 수 없습니다: " + ranking));
 
+        boolean alreadyLiked = likeRepository.existsByUserAndRecipe(user, recipe);
+        if (alreadyLiked) {
+            return new ResponseDTO<>(HttpStatus.OK.value(), "이미 찜한 레시피입니다.", null);
+        }
+
         LikeEntity like = LikeEntity.builder()
                 .user(user)
                 .recipe(recipe)
@@ -115,6 +122,25 @@ public class UserService {
         return new ResponseDTO<>(HttpStatus.OK.value(), "레시피 찜이 완료되었습니다.", null);
     }
 
+
+    // 레시피 찜 해제
+    @Transactional
+    public ResponseDTO<String> unlikeRecipe(String username, String ranking) {
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("해당 사용자 이름을 가진 사용자를 찾을 수 없습니다: " + username));
+
+        RecipeEntity recipe = recipeRepository.findByRanking(ranking)
+                .orElseThrow(() -> new IllegalArgumentException("해당 레시피를 찾을 수 없습니다: " + ranking));
+
+        LikeEntity like = likeRepository.findByUserAndRecipe(user, recipe)
+                .orElseThrow(() -> new IllegalArgumentException("해당 레시피는 찜한 상태가 아닙니다: " + ranking));
+
+        likeRepository.delete(like);
+
+        return new ResponseDTO<>(HttpStatus.OK.value(), "레시피 찜 해제가 완료되었습니다.", null);
+    }
+
+
     // 찜 레시피 조회
     public List<RecipeResponseDTO> getLikedRecipes(String username) {
         UserEntity user = userRepository.findByUsername(username)
@@ -122,6 +148,34 @@ public class UserService {
 
         return user.getLikes().stream()
                 .map(like -> RecipeResponseDTO.toDto(like.getRecipe()))
+                .collect(Collectors.toList());
+    }
+
+    // (알고리즘) 찜한 레시피
+    public List<RecipeResponseDTO> getTopCategoryRecipes(String username) {
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("해당 사용자 이름을 가진 사용자를 찾을 수 없습니다: " + username));
+
+        List<LikeEntity> likedRecipes = user.getLikes();
+
+        if (likedRecipes.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // 카테고리별 카운트
+        Map<String, Long> categoryCount = likedRecipes.stream()
+                .collect(Collectors.groupingBy(like -> like.getRecipe().getCategory(), Collectors.counting()));
+
+        String topCategory = Collections.max(categoryCount.entrySet(), Map.Entry.comparingByValue()).getKey();
+
+        // 해당 카테고리 레시피 10개 조회
+        List<RecipeEntity> topCategoryRecipes = recipeRepository.findByCategory(topCategory)
+                .stream()
+                .limit(10)
+                .collect(Collectors.toList());
+
+        return topCategoryRecipes.stream()
+                .map(RecipeResponseDTO::toDto)
                 .collect(Collectors.toList());
     }
 }
