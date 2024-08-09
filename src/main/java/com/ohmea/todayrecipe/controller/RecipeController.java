@@ -6,6 +6,7 @@ import com.ohmea.todayrecipe.service.RecipeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -44,7 +45,9 @@ public class RecipeController {
     //레시피 세부 조회
     @GetMapping("/detail/{ranking}")
     public ResponseEntity<ResponseDTO<RecipeResponseDTO>> getRecipeDetail(@PathVariable String ranking) {
-        RecipeResponseDTO response = recipeService.getRecipeByRanking(ranking);
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        RecipeResponseDTO response = recipeService.getRecipeByRanking(ranking, username);
         if (response == null) {
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND.value())
