@@ -11,5 +11,10 @@ import java.util.Optional;
 @Repository
 public interface RecipeRepository extends JpaRepository<RecipeEntity, String> {
     List<RecipeEntity> findByNameContainingIgnoreCase(String name);
-    Optional<RecipeEntity> findByRanking(String ranking);}
+    Optional<RecipeEntity> findByRanking(String ranking);
+
+    // 찜 알고리즘
+    List<RecipeEntity> findByCategory(String category);
+
+}
 

@@ -129,6 +129,16 @@ public class UserController {
                 .body(response);
     }
 
+    // 레시피 찜 해제
+    @DeleteMapping("/recipe/delete/{ranking}")
+    public ResponseEntity<ResponseDTO<String>> unlikeRecipe(@PathVariable String ranking) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        ResponseDTO<String> response = userService.unlikeRecipe(username, ranking);
+        return ResponseEntity
+                .status(HttpStatus.OK.value())
+                .body(response);
+    }
+
     // 찜한 레시피 조회
     @GetMapping("/like")
     public ResponseEntity<ResponseDTO<List<RecipeResponseDTO>>> getLikedRecipes() {
@@ -137,5 +147,15 @@ public class UserController {
         return ResponseEntity
                 .status(HttpStatus.OK.value())
                 .body(new ResponseDTO<>(200, "찜한 레시피 조회가 완료되었습니다.", response));
+    }
+
+    // (알고리즘) 찜한 레시피
+    @GetMapping("/recommend/category")
+    public ResponseEntity<ResponseDTO<List<RecipeResponseDTO>>> getTopCategoryRecipes() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        List<RecipeResponseDTO> topCategoryRecipes = userService.getTopCategoryRecipes(username);
+        return ResponseEntity
+                .status(HttpStatus.OK.value())
+                .body(new ResponseDTO<>(200, "가장 많이 찜한 카테고리의 레시피 조회 완료", topCategoryRecipes));
     }
 }
