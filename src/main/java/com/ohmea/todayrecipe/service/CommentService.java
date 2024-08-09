@@ -1,28 +1,52 @@
 package com.ohmea.todayrecipe.service;
+import com.ohmea.todayrecipe.dto.comment.CommentResponseDTO;
+import com.ohmea.todayrecipe.dto.comment.CreateCommentDTO;
 import com.ohmea.todayrecipe.entity.CommentEntity;
 import com.ohmea.todayrecipe.entity.RecipeEntity;
 import com.ohmea.todayrecipe.entity.UserEntity;
+import com.ohmea.todayrecipe.exception.RecipeNotFoundException;
+import com.ohmea.todayrecipe.repository.RecipeRepository;
+import com.ohmea.todayrecipe.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.ohmea.todayrecipe.repository.CommentRepository;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
+@Service
+@RequiredArgsConstructor
 public class CommentService {
-    @Autowired
-    private CommentRepository commentRepository;
 
-    public List<CommentEntity> getCommentsByRecipeId(String recipeId) {
-        return commentRepository.findByRecipe(recipeId);
+    private final CommentRepository commentRepository;
+    private final RecipeRepository recipeRepository;
+    private final UserRepository userRepository;
+
+    public List<CommentResponseDTO> getCommentsByRecipeRanking(String ranking) {
+        List<CommentEntity> commentEntityList = commentRepository.findByRecipe_Ranking(ranking);
+        List<CommentResponseDTO> commentResponseDTOList = new ArrayList<>();
+        commentEntityList.forEach(entity -> {
+            commentResponseDTOList.add(CommentResponseDTO.toDto(entity));
+        });
+        return commentResponseDTOList;
     }
 
-    public CommentEntity saveComment(String content, UserEntity user, String recipeId) {
+    public void saveComment(String content, String ranking, String username) {
+        RecipeEntity recipeEntity = recipeRepository.findByRanking(ranking)
+                .orElseThrow(() -> new RecipeNotFoundException("레시피를 찾을 수 없습니다. "));
+
+        UserEntity userEntity = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("해당 사용자 이름을 가진 사용자를 찾을 수 없습니다: " + username));
+
         CommentEntity comment = CommentEntity.builder()
                 .comment(content)
-                .user(user)
-                .recipe(recipeId)
+                .user(userEntity)
+                .recipe(recipeEntity)
                 .build();
-        return commentRepository.save(comment);
-    }
 
+        commentRepository.save(comment);
+    }
 }
 

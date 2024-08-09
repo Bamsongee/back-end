@@ -30,7 +30,6 @@ public class RecipeEntity {
     private String category;
 
 
-
     @Column(nullable = false, columnDefinition = "int default 0")
     private int manCount;
 
@@ -53,6 +52,5 @@ public class RecipeEntity {
     @OneToMany(mappedBy = "recipe", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @OrderBy("id asc") // 댓글 정렬
     private List<CommentEntity> comments;
-
 
 }

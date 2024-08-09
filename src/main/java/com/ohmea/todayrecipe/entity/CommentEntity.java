@@ -16,7 +16,7 @@ public class CommentEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     @Column(columnDefinition = "TEXT", nullable = false)
     private String comment;
@@ -25,11 +25,11 @@ public class CommentEntity {
     private LocalDateTime createdAt;
 
     @ManyToOne
-    @JoinColumn(name = "recipe_id")
-    private String recipe;
+    @JoinColumn(name = "recipe_id") // 외래 키 컬럼 이름을 명확히 지정
+    private RecipeEntity recipe;
 
     @ManyToOne
-    @JoinColumn(name = "comments")
-    private UserEntity user; // 작성자
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
 
 }

@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface CommentRepository extends JpaRepository<CommentEntity,Long> {
 
-    List<CommentEntity> findByRecipe(String recipeId);
+    List<CommentEntity> findByRecipe_Ranking(String ranking);
 }
