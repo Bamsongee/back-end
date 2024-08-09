@@ -42,4 +42,5 @@ public class RecipeController {
                 .status(HttpStatus.OK.value())
                 .body(new ResponseDTO<List<RecipeResponseDTO>>(200, "연관 레시피 조회 완료", response));
     }
+
 }

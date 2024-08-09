@@ -3,6 +3,9 @@ package com.ohmea.todayrecipe.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Builder
 @Getter
@@ -37,5 +40,8 @@ public class UserEntity {
         this.cookingBudget = cookingBudget == null ? this.cookingBudget : cookingBudget;
         this.filter = filter == null ? this.filter : filter;
     }
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<CommentEntity> comments = new ArrayList<>();
 
 }
