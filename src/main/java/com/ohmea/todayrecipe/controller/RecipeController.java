@@ -61,13 +61,12 @@ public class RecipeController {
     }
 
     // 요리 가능한 레시피 출력
-    /*
     @GetMapping("/possible")
-    public ResponseEntity<ResponseDTO<RecipeResponseDTO>> getRecipeDetail() {
+    public ResponseEntity<ResponseDTO> getRecipeDetail() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        RecipeResponseDTO response = recipeService.getPosibleRecipes(username);
+        List<RecipeResponseDTO> response = recipeService.getPosibleRecipes(username);
         return ResponseEntity
                 .status(HttpStatus.OK.value())
                 .body(new ResponseDTO<>(200, "예산, 재료 범위 내 요리 가능한 레시피 상세 조회 완료", response));
-    } */
+    }
 }

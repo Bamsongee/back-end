@@ -1,10 +1,7 @@
 package com.ohmea.todayrecipe.service;
 
 import com.ohmea.todayrecipe.dto.recipe.RecipeResponseDTO;
-import com.ohmea.todayrecipe.entity.IngredientEntity;
-import com.ohmea.todayrecipe.entity.RecipeEntity;
-import com.ohmea.todayrecipe.entity.RecipeIngredientEntity;
-import com.ohmea.todayrecipe.entity.UserEntity;
+import com.ohmea.todayrecipe.entity.*;
 import com.ohmea.todayrecipe.repository.RecipeRepository;
 import com.ohmea.todayrecipe.repository.UserRepository;
 import com.ohmea.todayrecipe.util.CsvReader;
@@ -122,5 +119,52 @@ public class RecipeService {
         }
         recipeEntity.incrementViewCountByGender(user.getGender());
         return RecipeResponseDTO.toDto(recipeEntity);
+    }
+
+    public List<RecipeResponseDTO> getPosibleRecipes(String username) {
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("해당 사용자 이름을 가진 사용자를 찾을 수 없습니다: " + username));
+
+        List<LikeEntity> likeEntities = user.getLikes();
+        List<RecipeEntity> recipeEntities = likeEntities.stream()
+                .map(LikeEntity::getRecipe)
+                .toList();
+
+        List<RecipeEntity> filteredRecipeEntities = recipeEntities.stream()
+                .filter(recipt -> {
+                    if(user.getCookingBudget() >= recipt.getOneBudget()) {
+                        System.out.println(user.getIngredients().stream().toList());
+                        return countOverlappingIngredients(user.getIngredients(), recipt.getIngredients()) > 3;
+                    }
+                    return false;
+                }).toList();
+
+        return filteredRecipeEntities.stream()
+                .map(RecipeResponseDTO::toDto)
+                .toList();
+    }
+
+    // 두 재료 리스트에서 겹치는 재료 수 카운트
+    private int countOverlappingIngredients(List<IngredientEntity> ingredients1, List<RecipeIngredientEntity> ingredients2) {
+        Set<String> uniqueIngredients1 = ingredients1.stream()
+                .map(ingredient -> extractFirstWord(ingredient.getIngredient()))
+                .collect(Collectors.toSet());
+
+        Set<String> uniqueIngredients2 = ingredients2.stream()
+                .map(ingredient -> extractFirstWord(ingredient.getIngredient()))
+                .collect(Collectors.toSet());
+
+        // 중복된 재료 수 카운트
+        uniqueIngredients1.retainAll(uniqueIngredients2);
+
+        return uniqueIngredients1.size();
+    }
+
+    private String extractFirstWord(String ingredient) {
+        if (ingredient == null || ingredient.trim().isEmpty()) {
+            return "";
+        }
+        // 공백을 기준으로 첫 번째 단어를 추출
+        return ingredient.split("\\s+")[0];
     }
 }
