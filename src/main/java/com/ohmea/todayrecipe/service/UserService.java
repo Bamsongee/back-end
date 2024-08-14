@@ -178,4 +178,46 @@ public class UserService {
                 .map(RecipeResponseDTO::toDto)
                 .collect(Collectors.toList());
     }
+
+    // (알고리즘) 조회수 레시피
+    public List<RecipeResponseDTO> getTopRecipesByGender(String username) {
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("해당 사용자 이름을 가진 사용자를 찾을 수 없습니다: " + username));
+
+        GenderEnum gender = user.getGender();
+
+        List<RecipeEntity> topRecipes;
+        if (gender == GenderEnum.WOMAN) {
+            topRecipes = recipeRepository.findTop10ByOrderByWomanCountDesc();
+        } else if (gender == GenderEnum.MAN) {
+            topRecipes = recipeRepository.findTop10ByOrderByManCountDesc();
+        } else {
+            topRecipes = Collections.emptyList();
+        }
+
+        return topRecipes.stream()
+                .map(RecipeResponseDTO::toDto)
+                .collect(Collectors.toList());
+    }
+
+    // (알고리즘) 두 개 경로 합치기
+    public List<RecipeResponseDTO> getCombinedRecommendations(String username) {
+        // 카테고리 추천에서 10개 가져오기
+        List<RecipeResponseDTO> categoryRecommendations = getTopCategoryRecipes(username)
+                .stream()
+                .limit(10)
+                .collect(Collectors.toList());
+
+        // 조회수 추천에서 20개 가져오기
+        List<RecipeResponseDTO> genderRecommendations = getTopRecipesByGender(username)
+                .stream()
+                .limit(20)
+                .collect(Collectors.toList());
+
+        // 합치기
+        categoryRecommendations.addAll(genderRecommendations);
+
+        return categoryRecommendations;
+    }
+
 }

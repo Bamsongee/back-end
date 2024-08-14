@@ -22,6 +22,9 @@ public class RecipeResponseDTO {
     private String difficulty;
     private String keyword;
     private String category;
+    private int manCount;
+    private int womanCount;
+    private int totalCount;
 
     public static RecipeResponseDTO toDto(RecipeEntity recipeEntity) {
         return RecipeResponseDTO.builder()
@@ -36,6 +39,9 @@ public class RecipeResponseDTO {
                 .difficulty(recipeEntity.getDifficulty())
                 .keyword(recipeEntity.getKeyword())
                 .category(recipeEntity.getCategory())
+                .manCount(recipeEntity.getManCount())
+                .womanCount(recipeEntity.getWomanCount())
+                .totalCount(recipeEntity.getTotalCount())
                 .build();
     }
 }

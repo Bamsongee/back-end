@@ -16,5 +16,9 @@ public interface RecipeRepository extends JpaRepository<RecipeEntity, String> {
     // 찜 알고리즘
     List<RecipeEntity> findByCategory(String category);
 
+    // 조회수 알고리즘
+    List<RecipeEntity> findTop10ByOrderByWomanCountDesc();
+    List<RecipeEntity> findTop10ByOrderByManCountDesc();
+
 }
 
