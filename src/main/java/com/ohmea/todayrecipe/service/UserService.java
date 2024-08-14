@@ -151,6 +151,26 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    // 찜 레시피 카테고리별 필터링
+    public List<RecipeResponseDTO> getLikedRecipesByCategory(String username, String category) {
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("해당 사용자 이름을 가진 사용자를 찾을 수 없습니다: " + username));
+
+        // 사용자의 모든 찜 레시피 가져오기
+        List<RecipeEntity> recipeEntities = user.getLikes().stream()
+                .map(LikeEntity::getRecipe).toList();
+
+        // 카테고리 필터링
+        List<RecipeEntity> filteredRecipes = recipeEntities.stream()
+                .filter(recipe -> recipe.getCategory().equals(category))
+                .toList();
+
+        // DTO로 변환하여 응답
+        return filteredRecipes.stream()
+                .map(RecipeResponseDTO::toDto)
+                .toList();
+    }
+
     // (알고리즘) 찜한 레시피
     public List<RecipeResponseDTO> getTopCategoryRecipes(String username) {
         UserEntity user = userRepository.findByUsername(username)
@@ -219,5 +239,4 @@ public class UserService {
 
         return categoryRecommendations;
     }
-
 }

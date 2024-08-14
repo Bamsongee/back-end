@@ -149,6 +149,17 @@ public class UserController {
                 .body(new ResponseDTO<>(200, "찜한 레시피 조회가 완료되었습니다.", response));
     }
 
+
+    // 찜한 레시피 카테고리별 출력
+    @GetMapping("/like/filter")
+    public ResponseEntity<ResponseDTO> getLikedRecipesByCategory(@RequestParam("category") String category) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        List<RecipeResponseDTO> response = userService.getLikedRecipesByCategory(username, category);
+        return ResponseEntity
+                .status(HttpStatus.OK.value())
+                .body(new ResponseDTO<>(200, "찜한 레시피 카테고리별 조회가 완료되었습니다.", response));
+    }
+
     // (알고리즘) 찜한 레시피
     @GetMapping("/recommend/category")
     public ResponseEntity<ResponseDTO<List<RecipeResponseDTO>>> getTopCategoryRecipes() {

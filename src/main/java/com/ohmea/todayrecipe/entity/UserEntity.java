@@ -34,10 +34,10 @@ public class UserEntity {
     // admin
     private String role;
     // refrigerator 식재료들
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<IngredientEntity> ingredients = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<LikeEntity> likes = new ArrayList<>();
 
     // user 정보 업데이트
