@@ -35,23 +35,23 @@ public class RecipeService {
     }
 
 
-    public List<RecipeResponseDTO> getAllRecipes() {
+    public List<RecipeResponseDTO.list> getAllRecipes() {
         List<RecipeEntity> recipeEntities = recipeRepository.findAll();
-        List<RecipeResponseDTO> recipeResponseDTOList = new ArrayList<>();
+        List<RecipeResponseDTO.list> recipeResponseDTOList = new ArrayList<>();
 
         recipeEntities.forEach(entity -> {
-            recipeResponseDTOList.add(RecipeResponseDTO.toDto(entity));
+            recipeResponseDTOList.add(RecipeResponseDTO.list.toDto(entity));
         });
 
         return recipeResponseDTOList;
     }
 
-    public List<RecipeResponseDTO> searchRecipesByName(String name) {
+    public List<RecipeResponseDTO.list> searchRecipesByName(String name) {
         List<RecipeEntity> recipeEntities = recipeRepository.findByNameContainingIgnoreCase(name);
-        List<RecipeResponseDTO> recipeResponseDTOList = new ArrayList<>();
+        List<RecipeResponseDTO.list> recipeResponseDTOList = new ArrayList<>();
 
         recipeEntities.forEach(entity -> {
-            recipeResponseDTOList.add(RecipeResponseDTO.toDto(entity));
+            recipeResponseDTOList.add(RecipeResponseDTO.list.toDto(entity));
         });
 
         return recipeResponseDTOList;
@@ -121,7 +121,7 @@ public class RecipeService {
         return RecipeResponseDTO.toDto(recipeEntity);
     }
 
-    public List<RecipeResponseDTO> getPosibleRecipes(String username) {
+    public List<RecipeResponseDTO.list> getPosibleRecipes(String username) {
         UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 사용자 이름을 가진 사용자를 찾을 수 없습니다: " + username));
 
@@ -140,7 +140,7 @@ public class RecipeService {
                 }).toList();
 
         return filteredRecipeEntities.stream()
-                .map(RecipeResponseDTO::toDto)
+                .map(RecipeResponseDTO.list::toDto)
                 .toList();
     }
 
