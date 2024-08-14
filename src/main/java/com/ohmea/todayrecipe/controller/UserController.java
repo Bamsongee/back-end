@@ -1,5 +1,6 @@
 package com.ohmea.todayrecipe.controller;
 
+import com.ohmea.todayrecipe.dto.comment.CommentResponseDTO;
 import com.ohmea.todayrecipe.dto.recipe.RecipeResponseDTO;
 import com.ohmea.todayrecipe.dto.response.ResponseDTO;
 import com.ohmea.todayrecipe.dto.user.JoinDTO;
@@ -8,6 +9,7 @@ import com.ohmea.todayrecipe.dto.user.UserResponseDTO;
 import com.ohmea.todayrecipe.entity.RefreshEntity;
 import com.ohmea.todayrecipe.jwt.JWTUtil;
 import com.ohmea.todayrecipe.repository.RefreshRedisRepository;
+import com.ohmea.todayrecipe.service.CommentService;
 import com.ohmea.todayrecipe.service.UserService;
 import com.ohmea.todayrecipe.util.TokenErrorResponse;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -32,6 +34,7 @@ public class UserController {
     private final UserService userService;
     private final JWTUtil jwtUtil;
     private final RefreshRedisRepository refreshRedisRepository;
+    private final CommentService commentService;
 
     @GetMapping("/")
     public ResponseDTO<String> init(){
@@ -116,6 +119,16 @@ public class UserController {
                 .body(new ResponseDTO<UserResponseDTO>(200, "user 수정이 완료되었습니다.", userResponseDTO));
     }
 
+    // 유저 별 댓글 조회
+    @GetMapping("/mypage/comments")
+    public ResponseEntity<ResponseDTO<List<CommentResponseDTO>>> getUserComments() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        List<CommentResponseDTO> comments = commentService.getCommentsByUser(username);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new ResponseDTO<>(200, "사용자가 작성한 댓글 조회 완료", comments));
+    }
+
     // 레시피 찜
     @PostMapping("/recipe/like/{ranking}")
     public ResponseEntity<ResponseDTO> likeRecipe(@PathVariable String ranking) {
@@ -186,4 +199,5 @@ public class UserController {
                 .status(HttpStatus.OK.value())
                 .body(new ResponseDTO<>(200, "레시피 맞춤 알고리즘 조회 완료", response));
     }
+
 }

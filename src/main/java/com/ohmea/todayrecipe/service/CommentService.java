@@ -48,5 +48,14 @@ public class CommentService {
 
         commentRepository.save(comment);
     }
+
+    public List<CommentResponseDTO> getCommentsByUser(String username) {
+        List<CommentEntity> commentEntityList = commentRepository.findByUsername(username);
+        List<CommentResponseDTO> commentResponseDTOList = new ArrayList<>();
+        commentEntityList.forEach(entity -> {
+            commentResponseDTOList.add(CommentResponseDTO.toDto(entity));
+        });
+        return commentResponseDTOList;
+    }
 }
 
