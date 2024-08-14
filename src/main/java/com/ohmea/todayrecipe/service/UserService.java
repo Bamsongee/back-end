@@ -7,9 +7,12 @@ import com.ohmea.todayrecipe.dto.user.UpdateUserDTO;
 import com.ohmea.todayrecipe.dto.user.UserResponseDTO;
 import com.ohmea.todayrecipe.entity.*;
 import com.ohmea.todayrecipe.exception.EntityDuplicatedException;
+import com.ohmea.todayrecipe.exception.LikeNotFoundException;
+import com.ohmea.todayrecipe.exception.RecipeNotFoundException;
 import com.ohmea.todayrecipe.repository.LikeRepository;
 import com.ohmea.todayrecipe.repository.RecipeRepository;
 import com.ohmea.todayrecipe.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -22,18 +25,13 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
+
 public class UserService {
     private final UserRepository userRepository;
     private final RecipeRepository recipeRepository;
     private final LikeRepository likeRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
-
-    public UserService(UserRepository userRepository, RecipeRepository recipeRepository, LikeRepository likeRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
-        this.userRepository = userRepository;
-        this.recipeRepository = recipeRepository;
-        this.likeRepository = likeRepository;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-    }
 
     public ResponseDTO<String> joinProcess(JoinDTO joinDTO) {
 
@@ -102,7 +100,7 @@ public class UserService {
 
     // 레시피 찜
     @Transactional
-    public ResponseDTO<String> likeRecipe(String username, String ranking) {
+    public String likeRecipe(String username, String ranking) {
         UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 사용자 이름을 가진 사용자를 찾을 수 없습니다: " + username));
         RecipeEntity recipe = recipeRepository.findById(ranking)
@@ -110,7 +108,7 @@ public class UserService {
 
         boolean alreadyLiked = likeRepository.existsByUserAndRecipe(user, recipe);
         if (alreadyLiked) {
-            return new ResponseDTO<>(HttpStatus.OK.value(), "이미 찜한 레시피입니다.", null);
+            return "이미 찜한 레시피입니다.";
         }
 
         LikeEntity like = LikeEntity.builder()
@@ -119,25 +117,23 @@ public class UserService {
                 .build();
         likeRepository.save(like);
 
-        return new ResponseDTO<>(HttpStatus.OK.value(), "레시피 찜이 완료되었습니다.", null);
+        return "레시피 찜이 완료되었습니다.";
     }
 
 
     // 레시피 찜 해제
     @Transactional
-    public ResponseDTO<String> unlikeRecipe(String username, String ranking) {
+    public void unlikeRecipe(String username, Long id) {
         UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 사용자 이름을 가진 사용자를 찾을 수 없습니다: " + username));
 
-        RecipeEntity recipe = recipeRepository.findByRanking(ranking)
-                .orElseThrow(() -> new IllegalArgumentException("해당 레시피를 찾을 수 없습니다: " + ranking));
+        RecipeEntity recipe = recipeRepository.findById(id)
+                .orElseThrow(() -> new RecipeNotFoundException("해당 레시피를 찾을 수 없습니다: " + id));
 
         LikeEntity like = likeRepository.findByUserAndRecipe(user, recipe)
-                .orElseThrow(() -> new IllegalArgumentException("해당 레시피는 찜한 상태가 아닙니다: " + ranking));
+                .orElseThrow(() -> new LikeNotFoundException("해당 레시피는 찜한 상태가 아닙니다: " + id));
 
         likeRepository.delete(like);
-
-        return new ResponseDTO<>(HttpStatus.OK.value(), "레시피 찜 해제가 완료되었습니다.", null);
     }
 
 
@@ -172,7 +168,7 @@ public class UserService {
     }
 
     // (알고리즘) 찜한 레시피
-    public List<RecipeResponseDTO> getTopCategoryRecipes(String username) {
+    public List<RecipeResponseDTO.list> getTopCategoryRecipes(String username) {
         UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 사용자 이름을 가진 사용자를 찾을 수 없습니다: " + username));
 
@@ -195,12 +191,12 @@ public class UserService {
                 .collect(Collectors.toList());
 
         return topCategoryRecipes.stream()
-                .map(RecipeResponseDTO::toDto)
+                .map(RecipeResponseDTO.list::toDto)
                 .collect(Collectors.toList());
     }
 
     // (알고리즘) 조회수 레시피
-    public List<RecipeResponseDTO> getTopRecipesByGender(String username) {
+    public List<RecipeResponseDTO.list> getTopRecipesByGender(String username) {
         UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 사용자 이름을 가진 사용자를 찾을 수 없습니다: " + username));
 
@@ -216,20 +212,20 @@ public class UserService {
         }
 
         return topRecipes.stream()
-                .map(RecipeResponseDTO::toDto)
+                .map(RecipeResponseDTO.list::toDto)
                 .collect(Collectors.toList());
     }
 
     // (알고리즘) 두 개 경로 합치기
-    public List<RecipeResponseDTO> getCombinedRecommendations(String username) {
+    public List<RecipeResponseDTO.list> getCombinedRecommendations(String username) {
         // 카테고리 추천에서 10개 가져오기
-        List<RecipeResponseDTO> categoryRecommendations = getTopCategoryRecipes(username)
+        List<RecipeResponseDTO.list> categoryRecommendations = getTopCategoryRecipes(username)
                 .stream()
                 .limit(10)
                 .collect(Collectors.toList());
 
         // 조회수 추천에서 20개 가져오기
-        List<RecipeResponseDTO> genderRecommendations = getTopRecipesByGender(username)
+        List<RecipeResponseDTO.list> genderRecommendations = getTopRecipesByGender(username)
                 .stream()
                 .limit(20)
                 .collect(Collectors.toList());

@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RecipeResponseDTO {
-    private String ranking;
+    private Long id;
     private String name;
     private String link;
     private String imageUrl;
@@ -30,7 +30,7 @@ public class RecipeResponseDTO {
 
     public static RecipeResponseDTO toDto(RecipeEntity recipeEntity) {
         return RecipeResponseDTO.builder()
-                .ranking(recipeEntity.getRanking())
+                .id(recipeEntity.getId())
                 .name(recipeEntity.getName())
                 .link(recipeEntity.getLink())
                 .imageUrl(recipeEntity.getImgURL())
@@ -45,5 +45,33 @@ public class RecipeResponseDTO {
                 .womanCount(recipeEntity.getWomanCount())
                 .totalCount(recipeEntity.getTotalCount())
                 .build();
+    }
+
+    @Builder
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class list {
+        private Long id;
+        private String name;
+        private String link;
+        private String imageUrl;
+        private String time;
+        private String difficulty;
+        private String keyword;
+        private String category;
+
+        public static list toDto(RecipeEntity recipeEntity) {
+            return list.builder()
+                    .id(recipeEntity.getId())
+                    .name(recipeEntity.getName())
+                    .link(recipeEntity.getLink())
+                    .imageUrl(recipeEntity.getImgURL())
+                    .time(recipeEntity.getTime())
+                    .difficulty(recipeEntity.getDifficulty())
+                    .keyword(recipeEntity.getKeyword())
+                    .category(recipeEntity.getCategory())
+                    .build();
+        }
     }
 }

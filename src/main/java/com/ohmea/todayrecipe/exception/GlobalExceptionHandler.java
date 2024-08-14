@@ -67,4 +67,11 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponseDTO(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
     }
+
+    @ExceptionHandler(LikeNotFoundException.class)
+    public ResponseEntity<ErrorResponseDTO> handleLikeNotFoundException(LikeNotFoundException e) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponseDTO(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
+    }
 }

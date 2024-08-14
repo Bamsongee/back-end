@@ -26,7 +26,7 @@ public class CommentController {
     }
 
     @PostMapping
-    public ResponseEntity<ResponseDTO> addComment(@PathVariable String recipeId,  @RequestBody CreateCommentDTO createCommentDTO) {
+    public ResponseEntity<ResponseDTO> addComment(@PathVariable Long recipeId,  @RequestBody CreateCommentDTO createCommentDTO) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         commentService.saveComment(createCommentDTO.getComment(), recipeId, username);
 

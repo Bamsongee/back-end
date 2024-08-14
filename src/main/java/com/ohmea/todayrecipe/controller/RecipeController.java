@@ -20,19 +20,19 @@ public class RecipeController {
     private final RecipeService recipeService;
 
     @GetMapping
-    public ResponseEntity<ResponseDTO<List<RecipeResponseDTO>>> getAllRecipes() {
-        List<RecipeResponseDTO> response = recipeService.getAllRecipes();
+    public ResponseEntity<ResponseDTO<List<RecipeResponseDTO.list>>> getAllRecipes() {
+        List<RecipeResponseDTO.list> response = recipeService.getAllRecipes();
         return ResponseEntity
                 .status(HttpStatus.OK.value())
-                .body(new ResponseDTO<List<RecipeResponseDTO>>(200, "레시피 전체 조회 완료", response));
+                .body(new ResponseDTO<List<RecipeResponseDTO.list>>(200, "레시피 전체 조회 완료", response));
     }
 
     @GetMapping("/search")
-    public ResponseEntity<ResponseDTO<List<RecipeResponseDTO>>> searchRecipes(@RequestParam String name) {
-        List<RecipeResponseDTO> response = recipeService.searchRecipesByName(name);
+    public ResponseEntity<ResponseDTO<List<RecipeResponseDTO.list>>> searchRecipes(@RequestParam String name) {
+        List<RecipeResponseDTO.list> response = recipeService.searchRecipesByName(name);
         return ResponseEntity
                 .status(HttpStatus.OK.value())
-                .body(new ResponseDTO<List<RecipeResponseDTO>>(200, "레시피 검색 완료", response));
+                .body(new ResponseDTO<List<RecipeResponseDTO.list>>(200, "레시피 검색 완료", response));
     }
 
     /*
@@ -64,7 +64,7 @@ public class RecipeController {
     @GetMapping("/possible")
     public ResponseEntity<ResponseDTO> getRecipeDetail() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        List<RecipeResponseDTO> response = recipeService.getPosibleRecipes(username);
+        List<RecipeResponseDTO.list> response = recipeService.getPosibleRecipes(username);
         return ResponseEntity
                 .status(HttpStatus.OK.value())
                 .body(new ResponseDTO<>(200, "예산, 재료 범위 내 요리 가능한 레시피 상세 조회 완료", response));
