@@ -1,10 +1,10 @@
 package com.ohmea.todayrecipe.entity;
 
+import com.ohmea.todayrecipe.util.IngredientListConverter;
+import com.opencsv.bean.CsvBindByName;
+import com.opencsv.bean.CsvCustomBindByName;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
@@ -13,22 +13,55 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@Setter
 public class RecipeEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @CsvBindByName(column = "ranking")
     private String ranking;
+
+    @CsvBindByName(column = "name")
     private String name;
+
+    @CsvBindByName(column = "link")
     private String link;
+
+    @CsvBindByName(column = "imgURL")
     private String imgURL;
-    @Column(columnDefinition = "TEXT")
-    private String ingredients;
+
+    @CsvBindByName(column = "recipe")
     @Column(columnDefinition = "TEXT")
     private String recipe;
+
+    @CsvBindByName(column = "serving")
     private String serving;
+
+    @CsvBindByName(column = "time")
     private String time;
+
+    @CsvBindByName(column = "difficulty")
     private String difficulty;
+
+    @CsvBindByName(column = "keyword")
     private String keyword;
+
+    @CsvBindByName(column = "category")
     private String category;
 
+    @CsvBindByName(column = "oneBudget")
+    private Integer oneBudget;
+
+    @CsvBindByName(column = "totalBudget")
+    private Integer totalBudget;
+
+    // 식재료
+    @Setter
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "recipe_id")
+    @CsvCustomBindByName(converter = IngredientListConverter.class)
+    private List<RecipeIngredientEntity> ingredients;
 
     @Column(nullable = false, columnDefinition = "int default 0")
     private int manCount;
@@ -52,5 +85,9 @@ public class RecipeEntity {
     @OneToMany(mappedBy = "recipe", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @OrderBy("id asc") // 댓글 정렬
     private List<CommentEntity> comments;
+
+    // CSV 변환 중 사용
+    @Transient
+    private String ingredientsString;
 
 }

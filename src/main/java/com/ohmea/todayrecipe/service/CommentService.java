@@ -33,8 +33,8 @@ public class CommentService {
         return commentResponseDTOList;
     }
 
-    public void saveComment(String content, String ranking, String username) {
-        RecipeEntity recipeEntity = recipeRepository.findByRanking(ranking)
+    public void saveComment(String content, Long id, String username) {
+        RecipeEntity recipeEntity = recipeRepository.findById(id)
                 .orElseThrow(() -> new RecipeNotFoundException("레시피를 찾을 수 없습니다. "));
 
         UserEntity userEntity = userRepository.findByUsername(username)
@@ -47,6 +47,15 @@ public class CommentService {
                 .build();
 
         commentRepository.save(comment);
+    }
+
+    public List<CommentResponseDTO> getCommentsByUser(String username) {
+        List<CommentEntity> commentEntityList = commentRepository.findByUsername(username);
+        List<CommentResponseDTO> commentResponseDTOList = new ArrayList<>();
+        commentEntityList.forEach(entity -> {
+            commentResponseDTOList.add(CommentResponseDTO.toDto(entity));
+        });
+        return commentResponseDTOList;
     }
 }
 
