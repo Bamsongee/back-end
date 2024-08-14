@@ -7,6 +7,8 @@ import com.ohmea.todayrecipe.dto.user.UpdateUserDTO;
 import com.ohmea.todayrecipe.dto.user.UserResponseDTO;
 import com.ohmea.todayrecipe.entity.*;
 import com.ohmea.todayrecipe.exception.EntityDuplicatedException;
+import com.ohmea.todayrecipe.exception.LikeNotFoundException;
+import com.ohmea.todayrecipe.exception.RecipeNotFoundException;
 import com.ohmea.todayrecipe.repository.LikeRepository;
 import com.ohmea.todayrecipe.repository.RecipeRepository;
 import com.ohmea.todayrecipe.repository.UserRepository;
@@ -121,19 +123,17 @@ public class UserService {
 
     // 레시피 찜 해제
     @Transactional
-    public ResponseDTO<String> unlikeRecipe(String username, String ranking) {
+    public void unlikeRecipe(String username, Long id) {
         UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 사용자 이름을 가진 사용자를 찾을 수 없습니다: " + username));
 
-        RecipeEntity recipe = recipeRepository.findByRanking(ranking)
-                .orElseThrow(() -> new IllegalArgumentException("해당 레시피를 찾을 수 없습니다: " + ranking));
+        RecipeEntity recipe = recipeRepository.findById(id)
+                .orElseThrow(() -> new RecipeNotFoundException("해당 레시피를 찾을 수 없습니다: " + id));
 
         LikeEntity like = likeRepository.findByUserAndRecipe(user, recipe)
-                .orElseThrow(() -> new IllegalArgumentException("해당 레시피는 찜한 상태가 아닙니다: " + ranking));
+                .orElseThrow(() -> new LikeNotFoundException("해당 레시피는 찜한 상태가 아닙니다: " + id));
 
         likeRepository.delete(like);
-
-        return new ResponseDTO<>(HttpStatus.OK.value(), "레시피 찜 해제가 완료되었습니다.", null);
     }
 
 

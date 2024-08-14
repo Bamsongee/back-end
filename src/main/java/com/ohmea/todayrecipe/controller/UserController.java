@@ -6,9 +6,6 @@ import com.ohmea.todayrecipe.dto.user.JoinDTO;
 import com.ohmea.todayrecipe.dto.user.UpdateUserDTO;
 import com.ohmea.todayrecipe.dto.user.UserResponseDTO;
 import com.ohmea.todayrecipe.entity.RefreshEntity;
-import com.ohmea.todayrecipe.exception.AccessTokenExpiredException;
-import com.ohmea.todayrecipe.exception.NotRefreshTokenException;
-import com.ohmea.todayrecipe.exception.TokenNotFoundException;
 import com.ohmea.todayrecipe.jwt.JWTUtil;
 import com.ohmea.todayrecipe.repository.RefreshRedisRepository;
 import com.ohmea.todayrecipe.service.UserService;
@@ -130,13 +127,13 @@ public class UserController {
     }
 
     // 레시피 찜 해제
-    @DeleteMapping("/recipe/delete/{ranking}")
-    public ResponseEntity<ResponseDTO<String>> unlikeRecipe(@PathVariable String ranking) {
+    @DeleteMapping("/recipe/delete/{id}")
+    public ResponseEntity unlikeRecipe(@PathVariable Long id) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        ResponseDTO<String> response = userService.unlikeRecipe(username, ranking);
+        userService.unlikeRecipe(username, id);
         return ResponseEntity
                 .status(HttpStatus.OK.value())
-                .body(response);
+                .body(new ResponseDTO(200, "레시피 찜 해제가 완료되었습니다.", null));
     }
 
     // 찜한 레시피 조회

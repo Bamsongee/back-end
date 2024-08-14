@@ -33,8 +33,8 @@ public class CommentService {
         return commentResponseDTOList;
     }
 
-    public void saveComment(String content, String ranking, String username) {
-        RecipeEntity recipeEntity = recipeRepository.findByRanking(ranking)
+    public void saveComment(String content, Long id, String username) {
+        RecipeEntity recipeEntity = recipeRepository.findById(id)
                 .orElseThrow(() -> new RecipeNotFoundException("레시피를 찾을 수 없습니다. "));
 
         UserEntity userEntity = userRepository.findByUsername(username)
