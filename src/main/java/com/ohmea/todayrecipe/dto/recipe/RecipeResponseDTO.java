@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Builder
 @Getter
 @AllArgsConstructor
@@ -15,7 +17,7 @@ public class RecipeResponseDTO {
     private String name;
     private String link;
     private String imageUrl;
-    private RecipeIngredientDTO ingredients;
+    private List<String> ingredients;
     private String recipe;
     private String serving;
     private String time;
@@ -29,7 +31,7 @@ public class RecipeResponseDTO {
                 .name(recipeEntity.getName())
                 .link(recipeEntity.getLink())
                 .imageUrl(recipeEntity.getImgURL())
-                .ingredients(RecipeIngredientDTO.toDTO(recipeEntity.getIngredients()))
+                .ingredients(RecipeIngredientDTO.toStringList(recipeEntity.getIngredients()))
                 .recipe(recipeEntity.getRecipe())
                 .serving(recipeEntity.getServing())
                 .time(recipeEntity.getTime())
