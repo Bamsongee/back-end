@@ -24,11 +24,11 @@ public class CommentEntity {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipe_id") // 외래 키 컬럼 이름을 명확히 지정
     private RecipeEntity recipe;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private UserEntity user;
 
