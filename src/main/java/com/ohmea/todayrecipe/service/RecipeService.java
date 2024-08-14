@@ -7,6 +7,7 @@ import com.ohmea.todayrecipe.repository.UserRepository;
 import com.ohmea.todayrecipe.util.CsvReader;
 import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -15,17 +16,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class RecipeService {
 
-    @Autowired
-    private RecipeRepository recipeRepository;
+    private final RecipeRepository recipeRepository;
+    private final CsvReader csvReader;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private CsvReader csvReader;
-
-    @Autowired
-    private UserRepository userRepository;
     private static final String CSV_FILE_PATH = "static/recipe_entity.csv";
 
     @PostConstruct

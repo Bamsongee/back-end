@@ -10,6 +10,7 @@ import com.ohmea.todayrecipe.exception.EntityDuplicatedException;
 import com.ohmea.todayrecipe.repository.LikeRepository;
 import com.ohmea.todayrecipe.repository.RecipeRepository;
 import com.ohmea.todayrecipe.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -22,18 +23,13 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
+
 public class UserService {
     private final UserRepository userRepository;
     private final RecipeRepository recipeRepository;
     private final LikeRepository likeRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
-
-    public UserService(UserRepository userRepository, RecipeRepository recipeRepository, LikeRepository likeRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
-        this.userRepository = userRepository;
-        this.recipeRepository = recipeRepository;
-        this.likeRepository = likeRepository;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-    }
 
     public ResponseDTO<String> joinProcess(JoinDTO joinDTO) {
 
