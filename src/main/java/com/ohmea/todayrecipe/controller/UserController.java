@@ -169,4 +169,21 @@ public class UserController {
                 .status(HttpStatus.OK.value())
                 .body(new ResponseDTO<>(200, "가장 많이 찜한 카테고리의 레시피 조회 완료", topCategoryRecipes));
     }
+
+    // (알고리즘) 조회수 레시피
+    @GetMapping("/recommend/count")
+    public ResponseEntity<ResponseDTO<List<RecipeResponseDTO>>> getTopRecipesByGender() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        List<RecipeResponseDTO> topRecipes = userService.getTopRecipesByGender(username);
+        return ResponseEntity
+                .status(HttpStatus.OK.value())
+                .body(new ResponseDTO<>(200, "성별 기반 추천 레시피 조회 완료", topRecipes));
+    }
+
+    // (알고리즘) 합치기
+    @GetMapping("/algorithm")
+    public List<RecipeResponseDTO> getCombinedRecommendations() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userService.getCombinedRecommendations(username);
+    }
 }

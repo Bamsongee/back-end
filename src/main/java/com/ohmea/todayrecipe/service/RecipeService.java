@@ -118,6 +118,7 @@ public class RecipeService {
             return null;
         }
         recipeEntity.incrementViewCountByGender(user.getGender());
+        recipeRepository.save(recipeEntity);
         return RecipeResponseDTO.toDto(recipeEntity);
     }
 
