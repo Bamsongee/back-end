@@ -69,4 +69,13 @@ public class RecipeController {
                 .status(HttpStatus.OK.value())
                 .body(new ResponseDTO<>(200, "예산, 재료 범위 내 요리 가능한 레시피 상세 조회 완료", response));
     }
+
+    // 인기 레시피 조회
+    @GetMapping("/popular")
+    public ResponseEntity<ResponseDTO<List<RecipeResponseDTO.list>>> getTopPopularRecipes() {
+        List<RecipeResponseDTO.list> response = recipeService.getTop10PopularRecipes();
+        return ResponseEntity
+                .status(HttpStatus.OK.value())
+                .body(new ResponseDTO<>(200, "인기 레시피 조회 완료", response));
+    }
 }
