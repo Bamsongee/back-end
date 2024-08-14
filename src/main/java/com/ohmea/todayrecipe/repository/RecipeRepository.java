@@ -20,5 +20,8 @@ public interface RecipeRepository extends JpaRepository<RecipeEntity, String> {
     List<RecipeEntity> findTop10ByOrderByWomanCountDesc();
     List<RecipeEntity> findTop10ByOrderByManCountDesc();
 
+    // 전체 조회수
+    List<RecipeEntity> findTop10ByOrderByTotalCountDesc();
+
 }
 

@@ -165,4 +165,12 @@ public class RecipeService {
         // 공백을 기준으로 첫 번째 단어를 추출
         return ingredient.split("\\s+")[0];
     }
+
+    // 인기 레시피 조회
+    public List<RecipeResponseDTO.list> getTop10PopularRecipes() {
+        List<RecipeEntity> recipeEntities = recipeRepository.findTop10ByOrderByTotalCountDesc();
+        return recipeEntities.stream()
+                .map(RecipeResponseDTO.list::toDto)
+                .toList();
+    }
 }
