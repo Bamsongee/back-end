@@ -1,6 +1,7 @@
 package com.ohmea.todayrecipe.dto.recipe;
 
 import com.ohmea.todayrecipe.entity.RecipeEntity;
+import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,6 +23,9 @@ public class RecipeResponseDTO {
     private String difficulty;
     private String keyword;
     private String category;
+    private int manCount;
+    private int womanCount;
+    private int totalCount;
 
     public static RecipeResponseDTO toDto(RecipeEntity recipeEntity) {
         return RecipeResponseDTO.builder()
@@ -36,6 +40,9 @@ public class RecipeResponseDTO {
                 .difficulty(recipeEntity.getDifficulty())
                 .keyword(recipeEntity.getKeyword())
                 .category(recipeEntity.getCategory())
+                .womanCount(recipeEntity.getWomanCount())
+                .manCount(recipeEntity.getManCount())
+                .totalCount(recipeEntity.getTotalCount())
                 .build();
     }
 }
