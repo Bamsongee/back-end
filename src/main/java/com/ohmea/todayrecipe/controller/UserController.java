@@ -118,12 +118,12 @@ public class UserController {
 
     // 레시피 찜
     @PostMapping("/recipe/like/{ranking}")
-    public ResponseEntity<ResponseDTO<String>> likeRecipe(@PathVariable String ranking) {
+    public ResponseEntity<ResponseDTO> likeRecipe(@PathVariable String ranking) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        ResponseDTO<String> response = userService.likeRecipe(username, ranking);
+        String message = userService.likeRecipe(username, ranking);
         return ResponseEntity
                 .status(HttpStatus.OK.value())
-                .body(response);
+                .body(new ResponseDTO(200, message, null));
     }
 
     // 레시피 찜 해제
@@ -159,9 +159,9 @@ public class UserController {
 
     // (알고리즘) 찜한 레시피
     @GetMapping("/recommend/category")
-    public ResponseEntity<ResponseDTO<List<RecipeResponseDTO>>> getTopCategoryRecipes() {
+    public ResponseEntity<ResponseDTO<List<RecipeResponseDTO.list>>> getTopCategoryRecipes() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        List<RecipeResponseDTO> topCategoryRecipes = userService.getTopCategoryRecipes(username);
+        List<RecipeResponseDTO.list> topCategoryRecipes = userService.getTopCategoryRecipes(username);
         return ResponseEntity
                 .status(HttpStatus.OK.value())
                 .body(new ResponseDTO<>(200, "가장 많이 찜한 카테고리의 레시피 조회 완료", topCategoryRecipes));
@@ -169,9 +169,9 @@ public class UserController {
 
     // (알고리즘) 조회수 레시피
     @GetMapping("/recommend/count")
-    public ResponseEntity<ResponseDTO<List<RecipeResponseDTO>>> getTopRecipesByGender() {
+    public ResponseEntity<ResponseDTO<List<RecipeResponseDTO.list>>> getTopRecipesByGender() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        List<RecipeResponseDTO> topRecipes = userService.getTopRecipesByGender(username);
+        List<RecipeResponseDTO.list> topRecipes = userService.getTopRecipesByGender(username);
         return ResponseEntity
                 .status(HttpStatus.OK.value())
                 .body(new ResponseDTO<>(200, "성별 기반 추천 레시피 조회 완료", topRecipes));
@@ -179,8 +179,11 @@ public class UserController {
 
     // (알고리즘) 합치기
     @GetMapping("/algorithm")
-    public List<RecipeResponseDTO> getCombinedRecommendations() {
+    public ResponseEntity<ResponseDTO> getCombinedRecommendations() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        return userService.getCombinedRecommendations(username);
+        List<RecipeResponseDTO.list> response = userService.getCombinedRecommendations(username);
+        return ResponseEntity
+                .status(HttpStatus.OK.value())
+                .body(new ResponseDTO<>(200, "레시피 맞춤 알고리즘 조회 완료", response));
     }
 }

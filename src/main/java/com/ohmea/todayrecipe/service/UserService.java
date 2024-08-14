@@ -100,7 +100,7 @@ public class UserService {
 
     // 레시피 찜
     @Transactional
-    public ResponseDTO<String> likeRecipe(String username, String ranking) {
+    public String likeRecipe(String username, String ranking) {
         UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 사용자 이름을 가진 사용자를 찾을 수 없습니다: " + username));
         RecipeEntity recipe = recipeRepository.findById(ranking)
@@ -108,7 +108,7 @@ public class UserService {
 
         boolean alreadyLiked = likeRepository.existsByUserAndRecipe(user, recipe);
         if (alreadyLiked) {
-            return new ResponseDTO<>(HttpStatus.OK.value(), "이미 찜한 레시피입니다.", null);
+            return "이미 찜한 레시피입니다.";
         }
 
         LikeEntity like = LikeEntity.builder()
@@ -117,7 +117,7 @@ public class UserService {
                 .build();
         likeRepository.save(like);
 
-        return new ResponseDTO<>(HttpStatus.OK.value(), "레시피 찜이 완료되었습니다.", null);
+        return "레시피 찜이 완료되었습니다.";
     }
 
 
@@ -168,7 +168,7 @@ public class UserService {
     }
 
     // (알고리즘) 찜한 레시피
-    public List<RecipeResponseDTO> getTopCategoryRecipes(String username) {
+    public List<RecipeResponseDTO.list> getTopCategoryRecipes(String username) {
         UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 사용자 이름을 가진 사용자를 찾을 수 없습니다: " + username));
 
@@ -191,12 +191,12 @@ public class UserService {
                 .collect(Collectors.toList());
 
         return topCategoryRecipes.stream()
-                .map(RecipeResponseDTO::toDto)
+                .map(RecipeResponseDTO.list::toDto)
                 .collect(Collectors.toList());
     }
 
     // (알고리즘) 조회수 레시피
-    public List<RecipeResponseDTO> getTopRecipesByGender(String username) {
+    public List<RecipeResponseDTO.list> getTopRecipesByGender(String username) {
         UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 사용자 이름을 가진 사용자를 찾을 수 없습니다: " + username));
 
@@ -212,20 +212,20 @@ public class UserService {
         }
 
         return topRecipes.stream()
-                .map(RecipeResponseDTO::toDto)
+                .map(RecipeResponseDTO.list::toDto)
                 .collect(Collectors.toList());
     }
 
     // (알고리즘) 두 개 경로 합치기
-    public List<RecipeResponseDTO> getCombinedRecommendations(String username) {
+    public List<RecipeResponseDTO.list> getCombinedRecommendations(String username) {
         // 카테고리 추천에서 10개 가져오기
-        List<RecipeResponseDTO> categoryRecommendations = getTopCategoryRecipes(username)
+        List<RecipeResponseDTO.list> categoryRecommendations = getTopCategoryRecipes(username)
                 .stream()
                 .limit(10)
                 .collect(Collectors.toList());
 
         // 조회수 추천에서 20개 가져오기
-        List<RecipeResponseDTO> genderRecommendations = getTopRecipesByGender(username)
+        List<RecipeResponseDTO.list> genderRecommendations = getTopRecipesByGender(username)
                 .stream()
                 .limit(20)
                 .collect(Collectors.toList());
