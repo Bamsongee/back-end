@@ -15,7 +15,7 @@ public class RecipeResponseDTO {
     private String name;
     private String link;
     private String imageUrl;
-    private String ingredients;
+    private RecipeIngredientDTO ingredients;
     private String recipe;
     private String serving;
     private String time;
@@ -29,7 +29,7 @@ public class RecipeResponseDTO {
                 .name(recipeEntity.getName())
                 .link(recipeEntity.getLink())
                 .imageUrl(recipeEntity.getImgURL())
-                .ingredients(recipeEntity.getIngredients())
+                .ingredients(RecipeIngredientDTO.toDTO(recipeEntity.getIngredients()))
                 .recipe(recipeEntity.getRecipe())
                 .serving(recipeEntity.getServing())
                 .time(recipeEntity.getTime())

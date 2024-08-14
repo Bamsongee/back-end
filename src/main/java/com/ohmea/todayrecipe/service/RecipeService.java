@@ -1,7 +1,9 @@
 package com.ohmea.todayrecipe.service;
 
 import com.ohmea.todayrecipe.dto.recipe.RecipeResponseDTO;
+import com.ohmea.todayrecipe.entity.IngredientEntity;
 import com.ohmea.todayrecipe.entity.RecipeEntity;
+import com.ohmea.todayrecipe.entity.RecipeIngredientEntity;
 import com.ohmea.todayrecipe.entity.UserEntity;
 import com.ohmea.todayrecipe.repository.RecipeRepository;
 import com.ohmea.todayrecipe.repository.UserRepository;
@@ -13,6 +15,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -57,22 +60,24 @@ public class RecipeService {
         return recipeResponseDTOList;
     }
 
+    /*
     public List<RecipeResponseDTO> findRelatedRecipesByIngredients(String name) {
         List<RecipeEntity> allRecipes = recipeRepository.findAll();
         List<RecipeResponseDTO> relatedRecipes = new ArrayList<>();
 
+        // 타겟 레시피 찾기
         RecipeEntity targetRecipe = allRecipes.stream()
                 .filter(recipe -> recipe.getName().equalsIgnoreCase(name))
                 .findFirst()
                 .orElse(null);
 
         if (targetRecipe != null) {
-            String targetIngredients = targetRecipe.getIngredients(); // 기준 레시피 재료
+            List<RecipeIngredientEntity> targetIngredients = targetRecipe.getIngredients(); // 기준 레시피 재료
 
             // 다른 레시피와 비교
             for (RecipeEntity recipe : allRecipes) {
                 if (!recipe.getName().equalsIgnoreCase(name)) {
-                    String otherIngredients = recipe.getIngredients(); // 비교할 레시피 재료
+                    List<RecipeIngredientEntity> otherIngredients = recipe.getIngredients(); // 비교할 레시피 재료
 
                     // 겹치는 재료 수 계산
                     int overlapCount = countOverlappingIngredients(targetIngredients, otherIngredients);
@@ -89,20 +94,22 @@ public class RecipeService {
     }
 
 
-    // 두 문자열에서 겹치는 글자 수 카운트
-    private int countOverlappingIngredients(String str1, String str2) {
-        // 쉼표, 공백 제거
-        String[] ingredients1 = str1.replace(",", "").split("\\s+");
-        String[] ingredients2 = str2.replace(",", "").split("\\s+");
+    // 두 재료 리스트에서 겹치는 재료 수 카운트
+    private int countOverlappingIngredients(List<RecipeIngredientEntity> ingredients1, List<RecipeIngredientEntity> ingredients2) {
+        Set<String> uniqueIngredients1 = ingredients1.stream()
+                .map(RecipeIngredientEntity::getIngredient)
+                .collect(Collectors.toSet());
 
-        Set<String> uniqueIngredients1 = new HashSet<>(Arrays.asList(ingredients1));
-        Set<String> uniqueIngredients2 = new HashSet<>(Arrays.asList(ingredients2));
+        Set<String> uniqueIngredients2 = ingredients2.stream()
+                .map(RecipeIngredientEntity::getIngredient)
+                .collect(Collectors.toSet());
 
         // 중복된 재료 수 카운트
         uniqueIngredients1.retainAll(uniqueIngredients2);
+        System.out.println(uniqueIngredients1.size());
 
         return uniqueIngredients1.size();
-    }
+    } */
 
     //레시피 세부 조회
     public RecipeResponseDTO getRecipeByRanking(String ranking, String username) {
@@ -116,6 +123,4 @@ public class RecipeService {
         recipeEntity.incrementViewCountByGender(user.getGender());
         return RecipeResponseDTO.toDto(recipeEntity);
     }
-
-
 }
