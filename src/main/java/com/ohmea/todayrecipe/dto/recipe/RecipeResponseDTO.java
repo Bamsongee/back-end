@@ -66,6 +66,9 @@ public class RecipeResponseDTO {
         private String category;
         private Integer oneBudget;
         private Integer totalBudget;
+        private int manCount;
+        private int womanCount;
+        private int totalCount;
 
         public static list toDto(RecipeEntity recipeEntity) {
             return list.builder()
@@ -79,6 +82,9 @@ public class RecipeResponseDTO {
                     .category(recipeEntity.getCategory())
                     .oneBudget(recipeEntity.getOneBudget())
                     .totalBudget(recipeEntity.getTotalBudget())
+                    .manCount(recipeEntity.getManCount())
+                    .womanCount(recipeEntity.getWomanCount())
+                    .totalCount(recipeEntity.getTotalCount())
                     .build();
         }
     }
