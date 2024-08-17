@@ -10,26 +10,21 @@ import java.time.LocalDateTime;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "comments")
-
-public class CommentEntity {
+public class CommentEntity extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     @Column(columnDefinition = "TEXT", nullable = false)
     private String comment;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "recipe_id") // 외래 키 컬럼 이름을 명확히 지정
+    private RecipeEntity recipe;
 
-    @ManyToOne
-    @JoinColumn(name = "recipe_id")
-    private String recipe;
-
-    @ManyToOne
-    @JoinColumn(name = "comments")
-    private UserEntity user; // 작성자
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
 
 }

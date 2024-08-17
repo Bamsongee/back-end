@@ -1,25 +1,28 @@
 package com.ohmea.todayrecipe.service;
 
 import com.ohmea.todayrecipe.dto.recipe.RecipeResponseDTO;
-import com.ohmea.todayrecipe.entity.RecipeEntity;
+import com.ohmea.todayrecipe.entity.*;
 import com.ohmea.todayrecipe.repository.RecipeRepository;
+import com.ohmea.todayrecipe.repository.UserRepository;
 import com.ohmea.todayrecipe.util.CsvReader;
 import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class RecipeService {
 
-    @Autowired
-    private RecipeRepository recipeRepository;
+    private final RecipeRepository recipeRepository;
+    private final CsvReader csvReader;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private CsvReader csvReader;
     private static final String CSV_FILE_PATH = "static/recipe_entity.csv";
 
     @PostConstruct
@@ -29,44 +32,46 @@ public class RecipeService {
     }
 
 
-    public List<RecipeResponseDTO> getAllRecipes() {
+    public List<RecipeResponseDTO.list> getAllRecipes() {
         List<RecipeEntity> recipeEntities = recipeRepository.findAll();
-        List<RecipeResponseDTO> recipeResponseDTOList = new ArrayList<>();
+        List<RecipeResponseDTO.list> recipeResponseDTOList = new ArrayList<>();
 
         recipeEntities.forEach(entity -> {
-            recipeResponseDTOList.add(RecipeResponseDTO.toDto(entity));
+            recipeResponseDTOList.add(RecipeResponseDTO.list.toDto(entity));
         });
 
         return recipeResponseDTOList;
     }
 
-    public List<RecipeResponseDTO> searchRecipesByName(String name) {
+    public List<RecipeResponseDTO.list> searchRecipesByName(String name) {
         List<RecipeEntity> recipeEntities = recipeRepository.findByNameContainingIgnoreCase(name);
-        List<RecipeResponseDTO> recipeResponseDTOList = new ArrayList<>();
+        List<RecipeResponseDTO.list> recipeResponseDTOList = new ArrayList<>();
 
         recipeEntities.forEach(entity -> {
-            recipeResponseDTOList.add(RecipeResponseDTO.toDto(entity));
+            recipeResponseDTOList.add(RecipeResponseDTO.list.toDto(entity));
         });
 
         return recipeResponseDTOList;
     }
 
+    /*
     public List<RecipeResponseDTO> findRelatedRecipesByIngredients(String name) {
         List<RecipeEntity> allRecipes = recipeRepository.findAll();
         List<RecipeResponseDTO> relatedRecipes = new ArrayList<>();
 
+        // 타겟 레시피 찾기
         RecipeEntity targetRecipe = allRecipes.stream()
                 .filter(recipe -> recipe.getName().equalsIgnoreCase(name))
                 .findFirst()
                 .orElse(null);
 
         if (targetRecipe != null) {
-            String targetIngredients = targetRecipe.getIngredients(); // 기준 레시피 재료
+            List<RecipeIngredientEntity> targetIngredients = targetRecipe.getIngredients(); // 기준 레시피 재료
 
             // 다른 레시피와 비교
             for (RecipeEntity recipe : allRecipes) {
                 if (!recipe.getName().equalsIgnoreCase(name)) {
-                    String otherIngredients = recipe.getIngredients(); // 비교할 레시피 재료
+                    List<RecipeIngredientEntity> otherIngredients = recipe.getIngredients(); // 비교할 레시피 재료
 
                     // 겹치는 재료 수 계산
                     int overlapCount = countOverlappingIngredients(targetIngredients, otherIngredients);
@@ -83,14 +88,69 @@ public class RecipeService {
     }
 
 
-    // 두 문자열에서 겹치는 글자 수 카운트
-    private int countOverlappingIngredients(String str1, String str2) {
-        // 쉼표, 공백 제거
-        String[] ingredients1 = str1.replace(",", "").split("\\s+");
-        String[] ingredients2 = str2.replace(",", "").split("\\s+");
+    // 두 재료 리스트에서 겹치는 재료 수 카운트
+    private int countOverlappingIngredients(List<RecipeIngredientEntity> ingredients1, List<RecipeIngredientEntity> ingredients2) {
+        Set<String> uniqueIngredients1 = ingredients1.stream()
+                .map(RecipeIngredientEntity::getIngredient)
+                .collect(Collectors.toSet());
 
-        Set<String> uniqueIngredients1 = new HashSet<>(Arrays.asList(ingredients1));
-        Set<String> uniqueIngredients2 = new HashSet<>(Arrays.asList(ingredients2));
+        Set<String> uniqueIngredients2 = ingredients2.stream()
+                .map(RecipeIngredientEntity::getIngredient)
+                .collect(Collectors.toSet());
+
+        // 중복된 재료 수 카운트
+        uniqueIngredients1.retainAll(uniqueIngredients2);
+        System.out.println(uniqueIngredients1.size());
+
+        return uniqueIngredients1.size();
+    } */
+
+    //레시피 세부 조회
+    public RecipeResponseDTO getRecipeByRanking(String ranking, String username) {
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("해당 사용자 이름을 가진 사용자를 찾을 수 없습니다: " + username));
+
+        RecipeEntity recipeEntity = recipeRepository.findById(ranking).orElse(null);
+        if (recipeEntity == null) {
+            return null;
+        }
+        recipeEntity.incrementViewCountByGender(user.getGender());
+        recipeRepository.save(recipeEntity);
+        return RecipeResponseDTO.toDto(recipeEntity);
+    }
+
+    public List<RecipeResponseDTO.list> getPosibleRecipes(String username) {
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("해당 사용자 이름을 가진 사용자를 찾을 수 없습니다: " + username));
+
+        List<LikeEntity> likeEntities = user.getLikes();
+        List<RecipeEntity> recipeEntities = likeEntities.stream()
+                .map(LikeEntity::getRecipe)
+                .toList();
+
+        List<RecipeEntity> filteredRecipeEntities = recipeEntities.stream()
+                .filter(recipt -> {
+                    if(user.getCookingBudget() >= recipt.getOneBudget()) {
+                        System.out.println(user.getIngredients().stream().toList());
+                        return countOverlappingIngredients(user.getIngredients(), recipt.getIngredients()) > 3;
+                    }
+                    return false;
+                }).toList();
+
+        return filteredRecipeEntities.stream()
+                .map(RecipeResponseDTO.list::toDto)
+                .toList();
+    }
+
+    // 두 재료 리스트에서 겹치는 재료 수 카운트
+    private int countOverlappingIngredients(List<IngredientEntity> ingredients1, List<RecipeIngredientEntity> ingredients2) {
+        Set<String> uniqueIngredients1 = ingredients1.stream()
+                .map(ingredient -> extractFirstWord(ingredient.getIngredient()))
+                .collect(Collectors.toSet());
+
+        Set<String> uniqueIngredients2 = ingredients2.stream()
+                .map(ingredient -> extractFirstWord(ingredient.getIngredient()))
+                .collect(Collectors.toSet());
 
         // 중복된 재료 수 카운트
         uniqueIngredients1.retainAll(uniqueIngredients2);
@@ -98,14 +158,19 @@ public class RecipeService {
         return uniqueIngredients1.size();
     }
 
-    //레시피 세부 조회
-    public RecipeResponseDTO getRecipeByRanking(String ranking) {
-        RecipeEntity recipeEntity = recipeRepository.findById(ranking).orElse(null);
-        if (recipeEntity == null) {
-            return null;
+    private String extractFirstWord(String ingredient) {
+        if (ingredient == null || ingredient.trim().isEmpty()) {
+            return "";
         }
-        return RecipeResponseDTO.toDto(recipeEntity);
+        // 공백을 기준으로 첫 번째 단어를 추출
+        return ingredient.split("\\s+")[0];
     }
 
-
+    // 인기 레시피 조회
+    public List<RecipeResponseDTO.list> getTop10PopularRecipes() {
+        List<RecipeEntity> recipeEntities = recipeRepository.findTop10ByOrderByTotalCountDesc();
+        return recipeEntities.stream()
+                .map(RecipeResponseDTO.list::toDto)
+                .toList();
+    }
 }

@@ -16,8 +16,8 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class ProductService {
-    @Autowired private final ProductRepository productRepository;
-    @Autowired private CsvReader csvReader;
+    private final ProductRepository productRepository;
+    private final CsvReader csvReader;
     private static final String CSV_FILE_PATH = "static/product_entity.csv";
 
     @PostConstruct

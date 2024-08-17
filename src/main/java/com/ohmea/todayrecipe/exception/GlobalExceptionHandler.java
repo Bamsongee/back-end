@@ -60,4 +60,18 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.UNAUTHORIZED)
                 .body(new ErrorResponseDTO(HttpStatus.UNAUTHORIZED.value(), e.getMessage()));
     }
+
+    @ExceptionHandler(RecipeNotFoundException.class)
+    public ResponseEntity<ErrorResponseDTO> handleRecipeNotFoundException(RecipeNotFoundException e) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponseDTO(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
+    }
+
+    @ExceptionHandler(LikeNotFoundException.class)
+    public ResponseEntity<ErrorResponseDTO> handleLikeNotFoundException(LikeNotFoundException e) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponseDTO(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
+    }
 }
