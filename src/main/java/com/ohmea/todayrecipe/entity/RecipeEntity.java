@@ -39,7 +39,7 @@ public class RecipeEntity extends BaseEntity{
     private String serving;
 
     @CsvBindByName(column = "time")
-    private String time;
+    private Integer time;
 
     @CsvBindByName(column = "difficulty")
     private String difficulty;
