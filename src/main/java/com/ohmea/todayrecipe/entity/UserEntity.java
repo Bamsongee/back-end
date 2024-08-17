@@ -23,14 +23,10 @@ public class UserEntity extends BaseEntity{
     private String password;
     // 성별
     private GenderEnum gender;
-    // 나이
-    private Integer age;
     // 요리 실력
     private CookingSkillEnum cookingSkill;
     // 예산
     private Integer cookingBudget;
-    // 맞춤 필터링 제공
-    private String filter;
     // admin
     private String role;
     // refrigerator 식재료들
@@ -41,10 +37,9 @@ public class UserEntity extends BaseEntity{
     private List<LikeEntity> likes = new ArrayList<>();
 
     // user 정보 업데이트
-    public void updateUser(CookingSkillEnum cookingSkill, Integer cookingBudget, String filter) {
+    public void updateUser(CookingSkillEnum cookingSkill, Integer cookingBudget) {
         this.cookingSkill = cookingSkill == null ? this.cookingSkill : cookingSkill;
         this.cookingBudget = cookingBudget == null ? this.cookingBudget : cookingBudget;
-        this.filter = filter == null ? this.filter : filter;
     }
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
