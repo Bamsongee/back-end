@@ -38,9 +38,7 @@ public class UserService {
         String username = joinDTO.getUsername();
         String password = joinDTO.getPassword();
         GenderEnum gender = joinDTO.getGender();
-        Integer age = joinDTO.getAge();
         Integer cookingBudget = joinDTO.getCookingBudget();
-        String filter = joinDTO.getFilter();
         CookingSkillEnum cookingSkill = joinDTO.getCookingSkill();
 
         Boolean isExist = userRepository.existsByUsername(username);
@@ -55,8 +53,6 @@ public class UserService {
                 .gender(gender)
                 .cookingSkill(cookingSkill)
                 .cookingBudget(cookingBudget)
-                .filter(filter)
-                .age(age)
                 .role("ROLE_ADMIN")
                 .build();
 
@@ -72,10 +68,8 @@ public class UserService {
         return UserResponseDTO.builder()
                 .username(user.getUsername())
                 .gender(user.getGender())
-                .age(user.getAge())
                 .cookingBudget(user.getCookingBudget())
                 .cookingSkill(user.getCookingSkill())
-                .filter(user.getFilter())
                 .build();
     }
 
@@ -84,17 +78,15 @@ public class UserService {
         UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 사용자 이름을 가진 사용자를 찾을 수 없습니다: " + username));
 
-        user.updateUser(updateUserDTO.getCookingSkill(), updateUserDTO.getCookingBudget(), updateUserDTO.getFilter());
+        user.updateUser(updateUserDTO.getCookingSkill(), updateUserDTO.getCookingBudget());
 
         userRepository.save(user);
 
         return UserResponseDTO.builder()
                 .username(user.getUsername())
                 .gender(user.getGender())
-                .age(user.getAge())
                 .cookingBudget(user.getCookingBudget())
                 .cookingSkill(user.getCookingSkill())
-                .filter(user.getFilter())
                 .build();
     }
 
