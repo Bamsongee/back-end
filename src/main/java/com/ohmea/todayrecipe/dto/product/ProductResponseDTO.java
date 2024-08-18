@@ -26,6 +26,7 @@ public class ProductResponseDTO {
         return ProductResponseDTO.builder()
                 .id(productEntity.getId())
                 .image(productEntity.getImage())
+                .title(productEntity.getTitle())
                 .description(productEntity.getDescription())
                 .percent(productEntity.getPercent())
                 .price(productEntity.getPrice())

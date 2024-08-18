@@ -13,5 +13,4 @@ import lombok.NoArgsConstructor;
 public class UpdateUserDTO {
     private CookingSkillEnum cookingSkill;
     private Integer cookingBudget;
-    private String filter;
 }

@@ -20,7 +20,7 @@ public class RecipeResponseDTO {
     private List<String> ingredients;
     private String recipe;
     private String serving;
-    private String time;
+    private Integer time;
     private String difficulty;
     private String keyword;
     private String category;
@@ -60,7 +60,7 @@ public class RecipeResponseDTO {
         private String name;
         private String link;
         private String imageUrl;
-        private String time;
+        private Integer time;
         private String difficulty;
         private String keyword;
         private String category;

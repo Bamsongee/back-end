@@ -11,8 +11,6 @@ public class JoinDTO {
     private String username;
     private String password;
     private GenderEnum gender;
-    private Integer age;
     private CookingSkillEnum cookingSkill;
     private Integer cookingBudget;
-    private String filter;
 }
