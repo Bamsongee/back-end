@@ -25,7 +25,7 @@ public class IngredientService {
         UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 사용자 이름을 가진 사용자를 찾을 수 없습니다: " + username));
 
-        List<IngredientEntity> ingredientEntityList = ingredientRepository.findByUser(user);
+        List<IngredientEntity> ingredientEntityList = ingredientRepository.findByUserOrderByIdDesc(user);
         List<IngredientResponseDTO> ingredientResponseDTOList = new ArrayList<>();
 
         ingredientEntityList.forEach(entity -> {

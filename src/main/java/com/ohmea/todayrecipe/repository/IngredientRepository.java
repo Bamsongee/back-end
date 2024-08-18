@@ -9,6 +9,6 @@ import java.util.List;
 
 @Repository
 public interface IngredientRepository extends JpaRepository<IngredientEntity, Long> {
-    List<IngredientEntity> findByUser(UserEntity user);
+    List<IngredientEntity> findByUserOrderByIdDesc(UserEntity user);
     Boolean existsByIngredient(String ingredient);
 }
