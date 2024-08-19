@@ -2,6 +2,7 @@ package com.ohmea.todayrecipe.service;
 
 import com.ohmea.todayrecipe.dto.recipe.RecipeResponseDTO;
 import com.ohmea.todayrecipe.entity.*;
+import com.ohmea.todayrecipe.repository.LikeRepository;
 import com.ohmea.todayrecipe.repository.RecipeRepository;
 import com.ohmea.todayrecipe.repository.UserRepository;
 import com.ohmea.todayrecipe.util.CsvReader;
@@ -22,6 +23,7 @@ public class RecipeService {
     private final RecipeRepository recipeRepository;
     private final CsvReader csvReader;
     private final UserRepository userRepository;
+    private final LikeRepository likeRepository;
 
     private static final String CSV_FILE_PATH = "static/recipe_entity.csv";
 
@@ -70,7 +72,9 @@ public class RecipeService {
         }
         recipeEntity.incrementViewCountByGender(user.getGender());
         recipeRepository.save(recipeEntity);
-        return RecipeResponseDTO.toDto(recipeEntity);
+        boolean liked = likeRepository.existsByUserAndRecipe(user, recipeEntity);
+
+        return RecipeResponseDTO.toDto(recipeEntity, liked);
     }
 
 

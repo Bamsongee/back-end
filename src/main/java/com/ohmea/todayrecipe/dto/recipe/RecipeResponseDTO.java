@@ -29,8 +29,9 @@ public class RecipeResponseDTO {
     private int totalCount;
     private Integer oneBudget;
     private Integer totalBudget;
+    private boolean liked;
 
-    public static RecipeResponseDTO toDto(RecipeEntity recipeEntity) {
+    public static RecipeResponseDTO toDto(RecipeEntity recipeEntity, boolean liked) {
         return RecipeResponseDTO.builder()
                 .id(recipeEntity.getId())
                 .name(recipeEntity.getName())
@@ -48,6 +49,7 @@ public class RecipeResponseDTO {
                 .totalCount(recipeEntity.getTotalCount())
                 .oneBudget(recipeEntity.getOneBudget())
                 .totalBudget(recipeEntity.getTotalBudget())
+                .liked(liked)
                 .build();
     }
 
