@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface CommentRepository extends JpaRepository<CommentEntity,Long> {
 
-    List<CommentEntity> findByRecipeId(long recipe_id);
+    List<CommentEntity> findByRecipeId(Long recipe_id);
 
     // 유저 댓글 조회
     @Query("SELECT c FROM CommentEntity c WHERE c.user.username = :username")

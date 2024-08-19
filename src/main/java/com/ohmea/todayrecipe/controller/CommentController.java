@@ -17,7 +17,7 @@ public class CommentController {
     private CommentService commentService;
 
     @GetMapping
-    public ResponseEntity<ResponseDTO<List<CommentResponseDTO>>> getComments(@PathVariable long recipeId) {
+    public ResponseEntity<ResponseDTO<List<CommentResponseDTO>>> getComments(@PathVariable Long recipeId) {
         List<CommentResponseDTO> response = commentService.getCommentsByRecipeId(recipeId);
 
         return ResponseEntity
