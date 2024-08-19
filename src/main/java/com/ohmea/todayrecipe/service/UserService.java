@@ -92,11 +92,11 @@ public class UserService {
 
     // 레시피 찜
     @Transactional
-    public String likeRecipe(String username, String ranking) {
+    public String likeRecipe(String username, Long id) {
         UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 사용자 이름을 가진 사용자를 찾을 수 없습니다: " + username));
-        RecipeEntity recipe = recipeRepository.findById(ranking)
-                .orElseThrow(() -> new IllegalArgumentException("해당 레시피를 찾을 수 없습니다: " + ranking));
+        RecipeEntity recipe = recipeRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 레시피를 찾을 수 없습니다: " + id));
 
         boolean alreadyLiked = likeRepository.existsByUserAndRecipe(user, recipe);
         if (alreadyLiked) {

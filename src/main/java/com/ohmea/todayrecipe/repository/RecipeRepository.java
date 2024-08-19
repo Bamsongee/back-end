@@ -10,6 +10,7 @@ import java.util.Optional;
 
 @Repository
 public interface RecipeRepository extends JpaRepository<RecipeEntity, String> {
+
     List<RecipeEntity> findByNameContainingIgnoreCase(String name);
     Optional<RecipeEntity> findById(Long id);
 
