@@ -130,10 +130,10 @@ public class UserController {
     }
 
     // 레시피 찜
-    @PostMapping("/recipe/like/{ranking}")
-    public ResponseEntity<ResponseDTO> likeRecipe(@PathVariable String ranking) {
+    @PostMapping("/recipe/like/{id}")
+    public ResponseEntity<ResponseDTO> likeRecipe(@PathVariable Long id) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        String message = userService.likeRecipe(username, ranking);
+        String message = userService.likeRecipe(username, id);
         return ResponseEntity
                 .status(HttpStatus.OK.value())
                 .body(new ResponseDTO(200, message, null));

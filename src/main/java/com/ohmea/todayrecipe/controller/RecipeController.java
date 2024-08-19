@@ -44,12 +44,12 @@ public class RecipeController {
                 .body(new ResponseDTO<List<RecipeResponseDTO>>(200, "연관 레시피 조회 완료", response));
     } */
 
-    //레시피 세부 조회
-    @GetMapping("/detail/{ranking}")
-    public ResponseEntity<ResponseDTO<RecipeResponseDTO>> getRecipeDetail(@PathVariable String ranking) {
+    // 레시피 세부 조회
+    @GetMapping("/detail/{id}")
+    public ResponseEntity<ResponseDTO<RecipeResponseDTO>> getRecipeDetail(@PathVariable Long id) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        RecipeResponseDTO response = recipeService.getRecipeByRanking(ranking, username);
+        RecipeResponseDTO response = recipeService.getRecipeById(id, username);
         if (response == null) {
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND.value())
@@ -59,6 +59,7 @@ public class RecipeController {
                 .status(HttpStatus.OK.value())
                 .body(new ResponseDTO<>(200, "레시피 상세 조회 완료", response));
     }
+
 
     // 요리 가능한 레시피 출력
     @GetMapping("/possible")
