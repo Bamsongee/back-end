@@ -151,9 +151,9 @@ public class UserController {
 
     // 찜한 레시피 조회
     @GetMapping("/like")
-    public ResponseEntity<ResponseDTO<List<RecipeResponseDTO>>> getLikedRecipes() {
+    public ResponseEntity<ResponseDTO<?>> getLikedRecipes() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        List<RecipeResponseDTO> response = userService.getLikedRecipes(username);
+        List<RecipeResponseDTO.list> response = userService.getLikedRecipes(username);
         return ResponseEntity
                 .status(HttpStatus.OK.value())
                 .body(new ResponseDTO<>(200, "찜한 레시피 조회가 완료되었습니다.", response));
@@ -162,9 +162,9 @@ public class UserController {
 
     // 찜한 레시피 카테고리별 출력
     @GetMapping("/like/filter")
-    public ResponseEntity<ResponseDTO> getLikedRecipesByCategory(@RequestParam("category") String category) {
+    public ResponseEntity<ResponseDTO<?>> getLikedRecipesByCategory(@RequestParam("category") String category) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        List<RecipeResponseDTO> response = userService.getLikedRecipesByCategory(username, category);
+        List<RecipeResponseDTO.list> response = userService.getLikedRecipesByCategory(username, category);
         return ResponseEntity
                 .status(HttpStatus.OK.value())
                 .body(new ResponseDTO<>(200, "찜한 레시피 카테고리별 조회가 완료되었습니다.", response));
@@ -192,7 +192,7 @@ public class UserController {
 
     // (알고리즘) 합치기
     @GetMapping("/algorithm")
-    public ResponseEntity<ResponseDTO> getCombinedRecommendations() {
+    public ResponseEntity<ResponseDTO<?>> getCombinedRecommendations() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         List<RecipeResponseDTO.list> response = userService.getCombinedRecommendations(username);
         return ResponseEntity
