@@ -130,17 +130,17 @@ public class UserService {
 
 
     // 찜 레시피 조회
-    public List<RecipeResponseDTO> getLikedRecipes(String username) {
+    public List<RecipeResponseDTO.list> getLikedRecipes(String username) {
         UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 사용자 이름을 가진 사용자를 찾을 수 없습니다: " + username));
 
         return user.getLikes().stream()
-                .map(like -> RecipeResponseDTO.toDto(like.getRecipe()))
+                .map(like -> RecipeResponseDTO.list.toDto(like.getRecipe()))
                 .collect(Collectors.toList());
     }
 
     // 찜 레시피 카테고리별 필터링
-    public List<RecipeResponseDTO> getLikedRecipesByCategory(String username, String category) {
+    public List<RecipeResponseDTO.list> getLikedRecipesByCategory(String username, String category) {
         UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 사용자 이름을 가진 사용자를 찾을 수 없습니다: " + username));
 
@@ -155,7 +155,7 @@ public class UserService {
 
         // DTO로 변환하여 응답
         return filteredRecipes.stream()
-                .map(RecipeResponseDTO::toDto)
+                .map(RecipeResponseDTO.list::toDto)
                 .toList();
     }
 
@@ -180,7 +180,7 @@ public class UserService {
         List<RecipeEntity> topCategoryRecipes = recipeRepository.findByCategory(topCategory)
                 .stream()
                 .limit(10)
-                .collect(Collectors.toList());
+                .toList();
 
         return topCategoryRecipes.stream()
                 .map(RecipeResponseDTO.list::toDto)
