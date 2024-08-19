@@ -24,8 +24,8 @@ public class CommentService {
     private final RecipeRepository recipeRepository;
     private final UserRepository userRepository;
 
-    public List<CommentResponseDTO> getCommentsByRecipeRanking(String ranking) {
-        List<CommentEntity> commentEntityList = commentRepository.findByRecipe_Ranking(ranking);
+    public List<CommentResponseDTO> getCommentsByRecipeId(long recipe_id) {
+        List<CommentEntity> commentEntityList = commentRepository.findByRecipeId(recipe_id);
         List<CommentResponseDTO> commentResponseDTOList = new ArrayList<>();
         commentEntityList.forEach(entity -> {
             commentResponseDTOList.add(CommentResponseDTO.toDto(entity));

@@ -17,8 +17,8 @@ public class CommentController {
     private CommentService commentService;
 
     @GetMapping
-    public ResponseEntity<ResponseDTO<List<CommentResponseDTO>>> getComments(@PathVariable String recipeId) {
-        List<CommentResponseDTO> response = commentService.getCommentsByRecipeRanking(recipeId);
+    public ResponseEntity<ResponseDTO<List<CommentResponseDTO>>> getComments(@PathVariable long recipeId) {
+        List<CommentResponseDTO> response = commentService.getCommentsByRecipeId(recipeId);
 
         return ResponseEntity
                 .status(HttpStatus.OK.value())
