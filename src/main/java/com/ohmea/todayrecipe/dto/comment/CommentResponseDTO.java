@@ -18,6 +18,7 @@ public class CommentResponseDTO {
     private String username;
     private LocalDateTime createdAt;
     private Long recipeId;
+    private String recipeName;
 
     public static CommentResponseDTO toDto(CommentEntity comment) {
         return CommentResponseDTO.builder()
@@ -26,6 +27,8 @@ public class CommentResponseDTO {
                 .username(comment.getUser().getUsername())
                 .createdAt(comment.getCreatedAt())
                 .recipeId(comment.getRecipe().getId())
+                .recipeName(comment.getRecipe().getName())
                 .build();
     }
 }
+

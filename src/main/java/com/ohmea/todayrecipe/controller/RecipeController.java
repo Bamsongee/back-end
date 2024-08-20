@@ -35,15 +35,6 @@ public class RecipeController {
                 .body(new ResponseDTO<List<RecipeResponseDTO.list>>(200, "레시피 검색 완료", response));
     }
 
-    /*
-    @GetMapping("/relation")
-    public ResponseEntity<ResponseDTO<List<RecipeResponseDTO>>> findRelatedRecipes(@RequestParam String name) {
-        List<RecipeResponseDTO> response = recipeService.findRelatedRecipesByIngredients(name);
-        return ResponseEntity
-                .status(HttpStatus.OK.value())
-                .body(new ResponseDTO<List<RecipeResponseDTO>>(200, "연관 레시피 조회 완료", response));
-    } */
-
     // 레시피 세부 조회
     @GetMapping("/detail/{id}")
     public ResponseEntity<ResponseDTO<RecipeResponseDTO>> getRecipeDetail(@PathVariable Long id) {
