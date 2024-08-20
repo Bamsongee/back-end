@@ -18,6 +18,7 @@ public class CommentResponseDTO {
     private String username;
     private String createdAt;
     private Long recipeId;
+    private String recipeName;
 
     public static CommentResponseDTO toDto(CommentEntity comment) {
         // 날짜/시간 포맷터 생성
@@ -36,6 +37,8 @@ public class CommentResponseDTO {
                 .username(comment.getUser().getUsername())
                 .createdAt(formattedDateTime)
                 .recipeId(comment.getRecipe().getId())
+                .recipeName(comment.getRecipe().getName())
                 .build();
     }
 }
+
