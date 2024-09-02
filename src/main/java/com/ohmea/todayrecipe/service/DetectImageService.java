@@ -48,7 +48,7 @@ public class DetectImageService {
         List<IngredientExistsResponseDTO> ingredientExistsResponseDTOS = new ArrayList<>();
 
         detectedItems.forEach(item -> {
-            boolean isExists = ingredientRepository.existsByIngredient(item);
+            boolean isExists = ingredientRepository.existsByIngredientAndUser(item, user);
             if(!isExists) {
                 IngredientEntity refrigeratorEntity = IngredientEntity.builder()
                         .ingredient(item)
