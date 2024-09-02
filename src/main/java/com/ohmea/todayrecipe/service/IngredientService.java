@@ -42,7 +42,7 @@ public class IngredientService {
                 .orElseThrow(() -> new UsernameNotFoundException("해당 사용자 이름을 가진 사용자를 찾을 수 없습니다: " + username));
 
         String ingredient = createIngredientDTO.getIngredient();
-        boolean isExists = ingredientRepository.existsByIngredient(ingredient);
+        boolean isExists = ingredientRepository.existsByIngredientAndUser(ingredient, user);
 
         if(!isExists) {
             IngredientEntity ingredientEntity = IngredientEntity.builder()
